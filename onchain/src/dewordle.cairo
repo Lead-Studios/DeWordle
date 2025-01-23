@@ -20,13 +20,20 @@ mod DeWordle {
 
     #[abi(embed_v0)]
     impl DeWordleImpl of IDeWordle<ContractState> {
-        // TODO
-        fn set_daily_word(ref self: ContractState, word: ByteArray) {}
+        fn set_daily_word(ref self: ContractState, word: ByteArray) {
+            let word_len = word.len();
+            let mut i = 0;
 
-        //TODO
+            while (i < word_len) {
+                self.letters_in_word.append().write(word[i].into());
+                i += 1;
+            };
+            self.word_of_the_day.write(word);
+            self.word_len.write(word_len.try_into().unwrap());
+        }
+
         fn get_daily_word(self: @ContractState) -> ByteArray {
-            let word: ByteArray = "word";
-            word
+            self.word_of_the_day.read()
         }
 
         //TODO
