@@ -9,6 +9,8 @@ mod DeWordle {
         MutableVecTrait, VecTrait
     };
 
+    use dewordle::constants::LetterStates::{CORRECT, PRESENT, ABSENT};
+
     #[storage]
     struct Storage {
         word_of_the_day: ByteArray, //TODO: hash word
@@ -53,7 +55,32 @@ mod DeWordle {
 
         // TODO
         fn compare_word(ref self: ContractState, guessed_word: ByteArray) -> Span<u8> {
-            array![0, 1, 2].span()
+            let guessed_word_len = guessed_word.len();
+            let word = self.get_daily_word();
+            let mut i = 0;
+            let mut word_states = array![];
+
+            while (i < guessed_word_len) {
+                let mut j = 0;
+                if (guessed_word[i] == word[i]) {
+                    word_states.append(CORRECT);
+                } else {
+                    let prev_word_states = word_states.clone();
+                    while (j < guessed_word_len) {
+                        if (guessed_word[i] == word[j]) {
+                            word_states.append(PRESENT);
+                            j = guessed_word_len;
+                        }
+                        j += 1;
+                    };
+                    if (prev_word_states.len() == word_states.len()) {
+                        word_states.append(ABSENT);
+                    }
+                }
+                i += 1;
+            };
+
+            word_states.span()
         }
     }
 }
