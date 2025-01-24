@@ -46,9 +46,14 @@ mod DeWordle {
         // TODO
         fn submit_guess(ref self: ContractState, guessed_word: ByteArray) {}
 
-        // TODO
+        
         fn is_correct_word(ref self: ContractState, guessed_word: ByteArray) -> bool {
-            true
+            let correct_word: ByteArray = self.word_of_the_day.read();
+            if guessed_word == correct_word {
+                return true;
+            } else {
+                return false;
+            }
         }
 
         // TODO
