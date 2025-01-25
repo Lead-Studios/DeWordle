@@ -74,3 +74,37 @@ fn test_compare_word_when_some_letters_are_absent() {
         dewordle.compare_word("tsec") == array![0, 1, 1, 2].span(), 'Word not compared correctly'
     );
 }
+
+#[test]
+#[should_panic(expected: 'Length does not match')]
+fn test_compare_word_panics() {
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address: contract_address };
+
+    // Define and set the daily word
+    let daily_word = "slept";
+    dewordle.set_daily_word(daily_word.clone());
+
+    // Verify that the daily word was set correctly
+    assert(dewordle.get_daily_word() == daily_word, 'Daily word not stored correctly');
+
+    dewordle.compare_word("sweeps");
+}
+
+#[test]
+fn test_compare_word_when_some_letters_are_repeated() {
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address: contract_address };
+
+    // Define and set the daily word
+    let daily_word = "slept";
+    dewordle.set_daily_word(daily_word.clone());
+
+    // Verify that the daily word was set correctly
+    assert(dewordle.get_daily_word() == daily_word, 'Daily word not stored correctly');
+
+    assert(
+        dewordle.compare_word("sweep") == array![0, 2, 0, 2, 1].span(),
+        'Word not compared correctly'
+    );
+}

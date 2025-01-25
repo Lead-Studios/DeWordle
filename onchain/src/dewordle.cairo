@@ -57,26 +57,60 @@ mod DeWordle {
         fn compare_word(ref self: ContractState, guessed_word: ByteArray) -> Span<u8> {
             let guessed_word_len = guessed_word.len();
             let word = self.get_daily_word();
+
+            assert(guessed_word_len == word.len(), 'Length does not match');
+
             let mut i = 0;
             let mut word_states = array![];
+            let mut temp_states = array![];
+            let mut letter_count_list = array![];
 
             while (i < guessed_word_len) {
+                let mut count: u32 = 0;
                 let mut j = 0;
+                while (j < guessed_word_len) {
+                    if (word[i] == word[j]) {
+                        count += 1;
+                    }
+                    j += 1;
+                };
+                letter_count_list.append(count);
+                i += 1;
+            };
+
+            i = 0;
+
+            while (i < guessed_word_len) {
                 if (guessed_word[i] == word[i]) {
-                    word_states.append(CORRECT);
+                    temp_states.append(CORRECT);
                 } else {
-                    let prev_word_states = word_states.clone();
+                    temp_states.append(ABSENT);
+                }
+                i += 1;
+            };
+
+            i = 0;
+            while (i < guessed_word_len) {
+                let prev_word_states = word_states.clone();
+                if (*temp_states.at(i) == ABSENT) {
+                    let mut j = 0;
                     while (j < guessed_word_len) {
                         if (guessed_word[i] == word[j]) {
-                            word_states.append(PRESENT);
-                            j = guessed_word_len;
+                            if(*temp_states.at(j) != CORRECT){
+                                word_states.append(PRESENT);
+                                break;
+                            }
                         }
                         j += 1;
                     };
-                    if (prev_word_states.len() == word_states.len()) {
-                        word_states.append(ABSENT);
-                    }
+                if(prev_word_states.len() == word_states.len()){
+                    word_states.append(ABSENT);
                 }
+                }
+                else{
+                    word_states.append(CORRECT);
+                }
+
                 i += 1;
             };
 
