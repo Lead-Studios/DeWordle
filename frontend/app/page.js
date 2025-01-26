@@ -1,10 +1,8 @@
-import DeWordle from "../components/DeWordle.jsx";
-
-
-export default function Home() {
+import Keyboard from "@/components/Keyboard.jsx";
+export default function page() {
   return (
-    <main className="flex justify-center">
-      <DeWordle />
-    </main>
+    <div>
+      <Keyboard />
+    </div>
   );
 }
