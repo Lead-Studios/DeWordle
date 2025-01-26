@@ -56,7 +56,7 @@ mod DeWordle {
             }
         }
 
-        // TODO
+    
         fn compare_word(ref self: ContractState, guessed_word: ByteArray) -> Span<u8> {
             array![0, 1, 2].span()
         }
