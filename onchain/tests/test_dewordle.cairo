@@ -107,4 +107,16 @@ fn test_compare_word_when_some_letters_are_repeated() {
         dewordle.compare_word("sweep") == array![0, 2, 0, 2, 1].span(),
         'Word not compared correctly'
     );
+
+    // Define and set another daily word
+    let daily_word = "test";
+    dewordle.set_daily_word(daily_word.clone());
+
+    // Verify that the daily word was set correctly
+    assert(dewordle.get_daily_word() == daily_word, 'Daily word not stored correctly');
+
+    //  verify the word was compared correctly
+    assert(
+        dewordle.compare_word("less") == array![2, 0, 0, 2].span(), 'Word not compared correctly'
+    );
 }
