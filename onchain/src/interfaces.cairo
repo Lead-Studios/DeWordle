@@ -17,11 +17,11 @@ pub trait IDeWordle<TContractState> {
 #[derive(Drop, Serde, starknet::Store)]
 pub struct PlayerStat {
     pub player: ContractAddress,
-    pub score: u64,
+    pub score: u64, //TODO: Impl scoring logic
     pub games_played: u64,
     pub games_won: u64,
     pub current_streak: u64,
-    pub max_streak: u64
+    pub max_streak: u64 //TODO: Impl streaking logic
 }
 
 #[derive(Drop, Serde, starknet::Store)]

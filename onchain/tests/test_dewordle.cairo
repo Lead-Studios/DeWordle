@@ -21,8 +21,5 @@ fn test_set_daily_word() {
     dewordle.set_daily_word(daily_word.clone());
 
     // Verify that the daily word was set correctly
-    assert(
-        dewordle.get_daily_word() == daily_word,
-        'Daily word not stored correctly'
-    );
+    assert(dewordle.get_daily_word() == daily_word, 'Daily word not stored correctly');
 }
