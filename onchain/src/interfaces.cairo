@@ -21,7 +21,7 @@ pub struct PlayerStat {
     pub games_played: u64,
     pub games_won: u64,
     pub current_streak: u64,
-    pub max_streak: u64
+    pub max_streak: u64,
 }
 
 #[derive(Drop, Serde, starknet::Store)]
