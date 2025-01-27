@@ -34,12 +34,12 @@ fn test_is_correct_word() {
     dewordle.set_daily_word(correct_word.clone());
 
     // Test case 1: Correct guess
-    let guessed_word = "hello";
-    let result = dewordle.is_correct_word(guessed_word.clone());
-    assert(result == true, 'Test case 1 failed');
+let guessed_word = "hello";
+let result = dewordle.is_correct_word(guessed_word.clone());
+assert(result, 'Test case 1 failed');
 
     // Test case 2: Incorrect guess
-    let guessed_word = "world";
-    let result = dewordle.is_correct_word(guessed_word.clone());
-    assert(result == false, 'Test case 2 failed');
+let guessed_word = "world";
+let result = dewordle.is_correct_word(guessed_word.clone());
+assert(!result, 'Test case 2 failed');
 }

@@ -49,13 +49,8 @@ mod DeWordle {
 
         fn is_correct_word(ref self: ContractState, guessed_word: ByteArray) -> bool {
             let correct_word: ByteArray = self.word_of_the_day.read();
-            if guessed_word == correct_word {
-                return true;
-            } else {
-                return false;
-            }
+            guessed_word == correct_word
         }
-
 
         fn compare_word(ref self: ContractState, guessed_word: ByteArray) -> Span<u8> {
             array![0, 1, 2].span()
