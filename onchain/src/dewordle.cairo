@@ -96,18 +96,17 @@ mod DeWordle {
                     let mut j = 0;
                     while (j < guessed_word_len) {
                         if (guessed_word[i] == word[j]) {
-                            if(*temp_states.at(j) != CORRECT){
+                            if (*temp_states.at(j) != CORRECT) {
                                 word_states.append(PRESENT);
                                 break;
                             }
                         }
                         j += 1;
                     };
-                if(prev_word_states.len() == word_states.len()){
-                    word_states.append(ABSENT);
-                }
-                }
-                else{
+                    if (prev_word_states.len() == word_states.len()) {
+                        word_states.append(ABSENT);
+                    }
+                } else {
                     word_states.append(CORRECT);
                 }
 
