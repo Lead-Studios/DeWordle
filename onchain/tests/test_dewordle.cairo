@@ -22,6 +22,7 @@ fn test_set_daily_word() {
 
     // Verify that the daily word was set correctly
     assert(dewordle.get_daily_word() == daily_word, 'Daily word not stored correctly');
+
 }
 
 #[test]
@@ -107,4 +108,6 @@ fn test_compare_word_when_some_letters_are_repeated() {
         dewordle.compare_word("sweep") == array![0, 2, 0, 2, 1].span(),
         'Word not compared correctly'
     );
+
+
 }
