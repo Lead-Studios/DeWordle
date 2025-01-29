@@ -1,10 +1,13 @@
-import DeWordle from "../components/DeWordle.jsx";
-
-
-export default function Home() {
+import Keyboard from "@/components/Keyboard.jsx";
+import Navbar from "@/components/Navbar";
+import WordGrid from "@/components/WordGrid";
+export default function page() {
   return (
-    <main className="flex justify-center">
-      <DeWordle />
-    </main>
+    <div>
+    <Navbar/>
+    <WordGrid/>
+    <Keyboard />
+    </div>
   );
 }
+
