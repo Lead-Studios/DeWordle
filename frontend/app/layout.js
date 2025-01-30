@@ -1,6 +1,6 @@
 import { Geist, Azeret_Mono as Geist_Mono } from "next/font/google"
 import "./globals.css"
-import Footer from "@/components/footer"
+import Footer from "../components/footer" 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

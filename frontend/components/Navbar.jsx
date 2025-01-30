@@ -54,11 +54,13 @@ const Navbar = () => {
             />
           </button>
 
-          <CircleHelp
-            color="#29296E"
-            size={24}
-            className="hover:scale-110 hover:shadow-lg transition-transform"
-          />
+          <button onClick={() => setIsHelpGuideOpen(true)}>
+            <CircleHelp
+              color="#29296E"
+              size={24}
+              className="hover:scale-110 hover:shadow-lg transition-transform"
+            />
+          </button>
 
           {/* Connect Button */}
           <button className="bg-[#29296E] w-[150px] h-[39px] text-white text-sm font-semibold rounded-[15px] flex items-center justify-center transform transition-transform hover:scale-110 hover:shadow-lg">

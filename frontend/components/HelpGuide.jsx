@@ -1,24 +1,41 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { BookOpen, Settings, Gamepad2 } from "lucide-react"
-import Link from "next/link"
-import { helpContent } from "../app/helpContent"
+import React from "react";
+import { Button } from "../components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../components/ui/accordion";
+import { BookOpen, Settings, Gamepad2 } from "lucide-react";
+import Link from "next/link";
+import { helpContent } from "../app/helpContent";
 
 // Component for rendering individual letter tiles
 function LetterTile({ letter, state = "absent" }) {
-  const baseStyles = "w-8 h-8 flex items-center justify-center text-base font-bold border-2 select-none"
+  const baseStyles =
+    "w-8 h-8 flex items-center justify-center text-base font-bold border-2 select-none";
   const stateStyles = {
     correct: "bg-green-600 text-white border-green-600",
     present: "bg-yellow-500 text-white border-yellow-500",
-    absent: "dark:bg-gray-900 dark:text-white dark:border-gray-600 bg-gray-700 text-white border-gray-300",
-  }
+    absent:
+      "dark:bg-gray-900 dark:text-white dark:border-gray-600 bg-gray-700 text-white border-gray-300",
+  };
 
-  return <div className={`${baseStyles} ${stateStyles[state]}`}>{letter}</div>
+  return <div className={`${baseStyles} ${stateStyles[state]}`}>{letter}</div>;
 }
 
 // Component for rendering a word example with colored tiles
@@ -29,11 +46,19 @@ function WordExample({ word, correctIndex, presentIndex, absentIndex }) {
         <LetterTile
           key={index}
           letter={letter}
-          state={index === correctIndex ? "correct" : index === presentIndex ? "present" : index === absentIndex ? "absent" : " "}
+          state={
+            index === correctIndex
+              ? "correct"
+              : index === presentIndex
+              ? "present"
+              : index === absentIndex
+              ? "absent"
+              : " "
+          }
         />
       ))}
     </div>
-  )
+  );
 }
 
 // Main HelpGuide component
@@ -49,7 +74,10 @@ export function HelpGuide({ isOpen, onClose }) {
         {/* Tab navigation */}
         <Tabs defaultValue="getting-started" className="mt-4">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="getting-started" className="flex items-center gap-2">
+            <TabsTrigger
+              value="getting-started"
+              className="flex items-center gap-2"
+            >
               <BookOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Getting Started</span>
             </TabsTrigger>
@@ -57,7 +85,10 @@ export function HelpGuide({ isOpen, onClose }) {
               <Gamepad2 className="h-4 w-4" />
               <span className="hidden sm:inline">How to Play</span>
             </TabsTrigger>
-            <TabsTrigger value="troubleshooting" className="flex items-center gap-2">
+            <TabsTrigger
+              value="troubleshooting"
+              className="flex items-center gap-2"
+            >
               <Settings className="h-4 w-4" />
               <span className="hidden sm:inline">Troubleshooting</span>
             </TabsTrigger>
@@ -68,10 +99,16 @@ export function HelpGuide({ isOpen, onClose }) {
             <div className="text-sm text-muted-foreground mb-4">
               Welcome! Let's help you get started with our platform.
             </div>
-            <Accordion type="single" collapsible className="w-full hover:no-underline">
+            <Accordion
+              type="single"
+              collapsible
+              className="w-full hover:no-underline"
+            >
               {helpContent.gettingStarted.map((item, index) => (
                 <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="hover:no-underline">{item.title}</AccordionTrigger>
+                  <AccordionTrigger className="hover:no-underline">
+                    {item.title}
+                  </AccordionTrigger>
                   <AccordionContent>{item.content}</AccordionContent>
                 </AccordionItem>
               ))}
@@ -80,7 +117,9 @@ export function HelpGuide({ isOpen, onClose }) {
 
           {/* How to Play tab content */}
           <TabsContent value="features" className="mt-4">
-            <div className="text-sm text-muted-foreground mb-4">Learn how to play Wordle.</div>
+            <div className="text-sm text-muted-foreground mb-4">
+              Learn how to play Wordle.
+            </div>
             <div className="space-y-6">
               {helpContent.features.map((section, index) => {
                 switch (section.type) {
@@ -88,10 +127,12 @@ export function HelpGuide({ isOpen, onClose }) {
                   case "header":
                     return (
                       <div key={index}>
-                        <h2 className="text-2xl font-bold mb-2">{section.title}</h2>
+                        <h2 className="text-2xl font-bold mb-2">
+                          {section.title}
+                        </h2>
                         <p className="text-base mb-4">{section.subtitle}</p>
                       </div>
-                    )
+                    );
                   // Rules section
                   case "rules":
                     return (
@@ -102,12 +143,14 @@ export function HelpGuide({ isOpen, onClose }) {
                           </p>
                         ))}
                       </div>
-                    )
+                    );
                   // Examples section
                   case "examples":
                     return (
                       <div key={index} className="space-y-4">
-                        <h3 className="text-lg font-semibold">{section.title}</h3>
+                        <h3 className="text-lg font-semibold">
+                          {section.title}
+                        </h3>
                         {section.items.map((item, itemIndex) => (
                           <div key={itemIndex} className="space-y-2">
                             <WordExample
@@ -117,13 +160,22 @@ export function HelpGuide({ isOpen, onClose }) {
                               absentIndex={item.absentIndex}
                             />
                             <p className="text-sm">
-                              <strong>{item.word[item.absentIndex || item.correctIndex || item.presentIndex || 0]}</strong>{" "}
+                              <strong>
+                                {
+                                  item.word[
+                                    item.absentIndex ||
+                                      item.correctIndex ||
+                                      item.presentIndex ||
+                                      0
+                                  ]
+                                }
+                              </strong>{" "}
                               {item.explanation}
                             </p>
                           </div>
                         ))}
                       </div>
-                    )
+                    );
                   // Footer section
                   case "footer":
                     return (
@@ -141,12 +193,12 @@ export function HelpGuide({ isOpen, onClose }) {
                               </Link>
                               {part}
                             </React.Fragment>
-                          ),
+                          )
                         )}
                       </p>
-                    )
+                    );
                   default:
-                    return null
+                    return null;
                 }
               })}
             </div>
@@ -160,7 +212,9 @@ export function HelpGuide({ isOpen, onClose }) {
             <Accordion type="single" collapsible className="w-full">
               {helpContent.troubleshooting.map((item, index) => (
                 <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="hover:no-underline">{item.title}</AccordionTrigger>
+                  <AccordionTrigger className="hover:no-underline">
+                    {item.title}
+                  </AccordionTrigger>
                   <AccordionContent>{item.content}</AccordionContent>
                 </AccordionItem>
               ))}
@@ -176,6 +230,5 @@ export function HelpGuide({ isOpen, onClose }) {
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-
