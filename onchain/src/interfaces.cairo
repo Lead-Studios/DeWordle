@@ -5,8 +5,8 @@ pub trait IDeWordle<TContractState> {
     fn set_daily_word(ref self: TContractState, word: ByteArray);
     fn get_daily_word(self: @TContractState) -> ByteArray;
 
+    fn get_player_daily_stat(self: @TContractState, player: ContractAddress) -> DailyPlayerStat;
     fn play(ref self: TContractState);
-    // fn get_player_daily_stat(self: @TContractState, player: ContractAddress) -> DailyPlayerStat;
 
     fn submit_guess(ref self: TContractState, guessed_word: ByteArray);
     fn is_correct_word(ref self: TContractState, guessed_word: ByteArray) -> bool;
