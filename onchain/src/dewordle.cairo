@@ -8,8 +8,32 @@ mod DeWordle {
         StoragePointerReadAccess, StoragePointerWriteAccess, StoragePathEntry, Map, Vec,
         MutableVecTrait, VecTrait,
     };
+    use openzeppelin::access::accesscontrol::{AccessControlComponent};
+    use openzeppelin::access::ownable::OwnableComponent;
+    use openzeppelin::introspection::src5::SRC5Component;
 
     use dewordle::constants::LetterStates::{CORRECT, PRESENT, ABSENT};
+
+    const ADMIN_ROLE: felt252 = selector!("ADMIN_ROLE");
+
+    component!(path: SRC5Component, storage: src5, event: SRC5Event);
+    component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
+    component!(path: AccessControlComponent, storage: accesscontrol, event: AccessControlEvent);
+
+    #[abi(embed_v0)]
+    impl OwnableImpl = OwnableComponent::OwnableImpl<ContractState>;
+
+    impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
+
+    #[abi(embed_v0)]
+    impl SRC5Impl = SRC5Component::SRC5Impl<ContractState>;
+
+    #[abi(embed_v0)]
+    impl AccessControlImpl =
+        AccessControlComponent::AccessControlImpl<ContractState>;
+
+    impl AccessControlInternalImpl = AccessControlComponent::InternalImpl<ContractState>;
+    
 
     #[storage]
     struct Storage {
@@ -17,12 +41,37 @@ mod DeWordle {
         letters_in_word: Vec<felt252>, //TODO: hash letters
         word_len: u8,
         player_stat: Map<ContractAddress, PlayerStat>,
-        daily_player_stat: Map<ContractAddress, DailyPlayerStat> // TODO: track day
+        daily_player_stat: Map<ContractAddress, DailyPlayerStat>, // TODO: track day
+        #[substorage(v0)]
+        ownable: OwnableComponent::Storage,
+        #[substorage(v0)]
+        accesscontrol: AccessControlComponent::Storage,
+        #[substorage(v0)]
+        src5: SRC5Component::Storage,
+    }
+    
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        #[flat]
+        SRC5Event: SRC5Component::Event,
+        #[flat]
+        OwnableEvent: OwnableComponent::Event,
+        #[flat]
+        AccessControlEvent: AccessControlComponent::Event,
+    }
+
+    #[constructor]
+    fn constructor(ref self: ContractState, owner: ContractAddress) {
+        self.ownable.initializer(owner);
+        self.accesscontrol.initializer();
+        self.accesscontrol._grant_role(ADMIN_ROLE, owner);
     }
 
     #[abi(embed_v0)]
     impl DeWordleImpl of IDeWordle<ContractState> {
         fn set_daily_word(ref self: ContractState, word: ByteArray) {
+            self.accesscontrol.assert_only_role(ADMIN_ROLE);
             let word_len = word.len();
             let mut i = 0;
 
@@ -35,6 +84,7 @@ mod DeWordle {
         }
 
         fn get_daily_word(self: @ContractState) -> ByteArray {
+            self.accesscontrol.assert_only_role(ADMIN_ROLE);
             self.word_of_the_day.read()
         }
 
