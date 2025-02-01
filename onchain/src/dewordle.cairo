@@ -33,7 +33,7 @@ mod DeWordle {
         AccessControlComponent::AccessControlImpl<ContractState>;
 
     impl AccessControlInternalImpl = AccessControlComponent::InternalImpl<ContractState>;
-    
+
 
     #[storage]
     struct Storage {
@@ -49,7 +49,7 @@ mod DeWordle {
         #[substorage(v0)]
         src5: SRC5Component::Storage,
     }
-    
+
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
