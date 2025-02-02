@@ -1,5 +1,8 @@
 use starknet::ContractAddress;
-use snforge_std::{declare, ContractClassTrait, DeclareResultTrait, start_cheat_caller_address, stop_cheat_caller_address};
+use snforge_std::{
+    declare, ContractClassTrait, DeclareResultTrait, start_cheat_caller_address,
+    stop_cheat_caller_address
+};
 use dewordle::interfaces::{IDeWordleDispatcher, IDeWordleDispatcherTrait};
 
 fn OWNER() -> ContractAddress {
@@ -182,10 +185,10 @@ fn test_play_resets_existing_daily_player_stat() {
 
     // Call play function twice
     dewordle.play();
-    
+
     // Simulate some gameplay
     dewordle.submit_guess("guess");
-    
+
     // Call play again to reset
     dewordle.play();
 
@@ -283,7 +286,7 @@ fn test_play_does_not_affect_other_storage() {
 
     // Set up initial state
     dewordle.set_daily_word("test");
-    
+
     // Play
     dewordle.play();
 
