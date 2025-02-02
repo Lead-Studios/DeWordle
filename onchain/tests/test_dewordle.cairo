@@ -236,6 +236,8 @@ fn test_play_after_winning() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address: contract_address };
 
+    start_cheat_caller_address(contract_address, OWNER());
+
     // Set up a word and play
     dewordle.set_daily_word("test");
     dewordle.play();
@@ -252,12 +254,16 @@ fn test_play_after_winning() {
     assert(daily_stat.attempt_remaining == 6, 'Attempts not reset after win');
     assert(!daily_stat.has_won, 'has_won not reset after win');
     assert(daily_stat.won_at_attempt == 0, 'won_at_ampt not reset after win');
+
+    stop_cheat_caller_address(contract_address);
 }
 
 #[test]
 fn test_play_after_losing() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address: contract_address };
+
+    start_cheat_caller_address(contract_address, OWNER());
 
     // Set up a word and play
     dewordle.set_daily_word("test");
@@ -277,12 +283,16 @@ fn test_play_after_losing() {
     assert(daily_stat.attempt_remaining == 6, 'Attempts not reset after loss');
     assert(!daily_stat.has_won, 'has_won should be F after loss');
     assert(daily_stat.won_at_attempt == 0, 'won_at_attempt should be 0');
+
+    stop_cheat_caller_address(contract_address);
 }
 
 #[test]
 fn test_play_does_not_affect_other_storage() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address: contract_address };
+
+    start_cheat_caller_address(contract_address, OWNER());
 
     // Set up initial state
     dewordle.set_daily_word("test");
@@ -292,4 +302,6 @@ fn test_play_does_not_affect_other_storage() {
 
     // Check that daily word is unchanged
     assert(dewordle.get_daily_word() == "test", 'Daily word changed unexpectedly');
+
+    stop_cheat_caller_address(contract_address);
 }
