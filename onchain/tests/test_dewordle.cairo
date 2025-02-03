@@ -158,7 +158,6 @@ fn test_compare_word_when_some_letters_are_repeated() {
     );
 }
 
-
 #[test]
 fn test_play_initializes_daily_player_stat() {
     let contract_address = deploy_contract();
@@ -183,11 +182,17 @@ fn test_play_resets_existing_daily_player_stat() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address: contract_address };
 
-    // Call play function twice
+    start_cheat_caller_address(contract_address, OWNER());
+
+    // Set up a word and play
+    dewordle.set_daily_word("tests");
     dewordle.play();
 
     // Simulate some gameplay
-    dewordle.submit_guess("guess");
+    match dewordle.submit_guess("guess") {
+        Option::None => panic!("ERROR"),
+        Option::Some(_) => (),
+    }
 
     // Call play again to reset
     dewordle.play();
@@ -243,7 +248,10 @@ fn test_play_after_winning() {
     dewordle.play();
 
     // Simulate winning
-    dewordle.submit_guess("test");
+    match dewordle.submit_guess("test") {
+        Option::None => (),
+        Option::Some(_) => panic!("ERROR"),
+    }
 
     // Play again
     dewordle.play();
@@ -266,13 +274,17 @@ fn test_play_after_losing() {
     start_cheat_caller_address(contract_address, OWNER());
 
     // Set up a word and play
-    dewordle.set_daily_word("test");
+    dewordle.set_daily_word("tests");
     dewordle.play();
 
     // Simulate losing (6 incorrect guesses)
-    for _ in 0_u8..6_u8 {
-        dewordle.submit_guess("wrong");
-    };
+    for _ in 0_u8
+        ..6_u8 {
+            match dewordle.submit_guess("wrong") {
+                Option::None => panic!("ERROR"),
+                Option::Some(_) => (),
+            }
+        };
 
     // Play again
     dewordle.play();
@@ -304,4 +316,155 @@ fn test_play_does_not_affect_other_storage() {
     assert(dewordle.get_daily_word() == "test", 'Daily word changed unexpectedly');
 
     stop_cheat_caller_address(contract_address);
+}
+
+#[test]
+#[should_panic(expected: 'Length does not match')]
+fn test_submit_guess_panics_with_length_does_not_match() {
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address };
+
+    start_cheat_caller_address(contract_address, OWNER());
+
+    // Define and set the daily word
+    let daily_word = "slept";
+    dewordle.set_daily_word(daily_word.clone());
+
+    // Play
+    dewordle.play();
+
+    match dewordle.submit_guess("sweeps") {
+        Option::None => panic!("ERROR"),
+        Option::Some(_) => panic!("ERROR"),
+    }
+}
+
+#[test]
+#[should_panic(expected: 'Player has already won')]
+fn test_submit_guess_panics_with_player_has_already_won() {
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address };
+
+    start_cheat_caller_address(contract_address, OWNER());
+
+    // Define and set the daily word
+    let daily_word = "slept";
+    dewordle.set_daily_word(daily_word.clone());
+
+    // Play
+    dewordle.play();
+
+    match dewordle.submit_guess("slept") {
+        Option::None => (),
+        Option::Some(_) => panic!("ERROR"),
+    }
+
+    match dewordle.submit_guess("slept") {
+        Option::None => panic!("ERROR"),
+        Option::Some(_) => panic!("ERROR"),
+    }
+}
+
+#[test]
+#[should_panic(expected: 'Player has exhausted attempts')]
+fn test_submit_guess_panics_with_player_has_exhausted_attempts() {
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address };
+
+    start_cheat_caller_address(contract_address, OWNER());
+
+    // Define and set the daily word
+    let daily_word = "slept";
+    dewordle.set_daily_word(daily_word.clone());
+
+    // Play
+    dewordle.play();
+
+    // Simulate losing (6 incorrect guesses)
+    for _ in 0_u8
+        ..6_u8 {
+            match dewordle.submit_guess("wrong") {
+                Option::None => panic!("ERROR"),
+                Option::Some(_) => (),
+            }
+        };
+
+    match dewordle.submit_guess("wrong") {
+        Option::None => panic!("ERROR"),
+        Option::Some(_) => (),
+    }
+}
+
+#[test]
+fn test_submit_guess_when_incorrect() {
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address };
+
+    start_cheat_caller_address(contract_address, OWNER());
+
+    // Define and set the daily word
+    let daily_word = "slept";
+    dewordle.set_daily_word(daily_word.clone());
+
+    // Play
+    dewordle.play();
+
+    let daily_stat = dewordle.get_player_daily_stat(OWNER());
+    assert(daily_stat.player == OWNER(), 'Wrong player address');
+    assert(daily_stat.attempt_remaining == 6, 'attempt_remaining should be 6');
+    assert(!daily_stat.has_won, 'has_won should be false');
+    assert(daily_stat.won_at_attempt == 0, 'won_at_attempt should be 0');
+
+    match dewordle.submit_guess("wrong") {
+        Option::None => panic!("ERROR"),
+        Option::Some(_) => (),
+    }
+
+    // Check that daily stats are updated accordingly
+    let new_daily_stat = dewordle.get_player_daily_stat(OWNER());
+    assert(new_daily_stat.player == OWNER(), 'Wrong player address');
+    assert(
+        new_daily_stat.attempt_remaining == daily_stat.attempt_remaining - 1,
+        'Wrongattempt_remaining'
+    );
+    assert(!new_daily_stat.has_won, 'has_won should be false');
+    assert(new_daily_stat.won_at_attempt == 0, 'won_at_attempt should be 0');
+}
+
+#[test]
+fn test_submit_guess_when_correct() {
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address };
+
+    start_cheat_caller_address(contract_address, OWNER());
+
+    // Define and set the daily word
+    let daily_word = "slept";
+    dewordle.set_daily_word(daily_word.clone());
+
+    // Play
+    dewordle.play();
+
+    let daily_stat = dewordle.get_player_daily_stat(OWNER());
+    assert(daily_stat.player == OWNER(), 'Wrong player address');
+    assert(daily_stat.attempt_remaining == 6, 'attempt_remaining should be 6');
+    assert(!daily_stat.has_won, 'has_won should be false');
+    assert(daily_stat.won_at_attempt == 0, 'won_at_attempt should be 0');
+
+    match dewordle.submit_guess("slept") {
+        Option::None => (),
+        Option::Some(_) => panic!("ERROR"),
+    }
+
+    // Check that daily stats are updated accordingly
+    let new_daily_stat = dewordle.get_player_daily_stat(OWNER());
+    assert(new_daily_stat.player == OWNER(), 'Wrong player address');
+    assert(
+        new_daily_stat.attempt_remaining == daily_stat.attempt_remaining - 1,
+        'Wrong attempt_remaining'
+    );
+    assert(new_daily_stat.has_won, 'has_won should be true');
+    assert(
+        new_daily_stat.won_at_attempt == 6 - daily_stat.attempt_remaining, 'Wrong won_at_attempt'
+    );
 }

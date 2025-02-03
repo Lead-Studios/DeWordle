@@ -110,8 +110,32 @@ mod DeWordle {
             self.daily_player_stat.write(caller, new_daily_stat);
         }
 
-        // TODO
-        fn submit_guess(ref self: ContractState, guessed_word: ByteArray) {}
+        fn submit_guess(ref self: ContractState, guessed_word: ByteArray) -> Option<Span<u8>> {
+            assert(guessed_word.len() == self.word_len.read().into(), 'Length does not match');
+            let caller = starknet::get_caller_address();
+            let daily_stat = self.daily_player_stat.read(caller);
+            assert(!daily_stat.has_won, 'Player has already won');
+            assert(daily_stat.attempt_remaining > 0, 'Player has exhausted attempts');
+            if self.is_correct_word(guessed_word.clone()) {
+                let new_daily_stat = DailyPlayerStat {
+                    player: caller,
+                    attempt_remaining: daily_stat.attempt_remaining - 1,
+                    has_won: true,
+                    won_at_attempt: 6 - daily_stat.attempt_remaining,
+                };
+                self.daily_player_stat.write(caller, new_daily_stat);
+                Option::None
+            } else {
+                let new_daily_stat = DailyPlayerStat {
+                    player: caller,
+                    attempt_remaining: daily_stat.attempt_remaining - 1,
+                    has_won: false,
+                    won_at_attempt: 0,
+                };
+                self.daily_player_stat.write(caller, new_daily_stat);
+                Option::Some(self.compare_word(guessed_word.clone()))
+            }
+        }
 
 
         fn is_correct_word(ref self: ContractState, guessed_word: ByteArray) -> bool {
