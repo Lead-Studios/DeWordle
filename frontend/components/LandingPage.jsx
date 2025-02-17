@@ -1,7 +1,17 @@
+'use client';
+
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
 const LandingPage = () => {
+  const router = useRouter();
+
+  const handleLogIn = () => {
+    console.log("Log In clicked");
+    router.push("/signup");
+  };
+
   return (
     <div
       className="relative flex items-center justify-center w-full min-h-screen bg-center bg-cover bg-no-repeat"
@@ -27,7 +37,10 @@ const LandingPage = () => {
         {/* Buttons */}
         <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
           {/* Log In Button */}
-          <button className="px-6 py-3 w-full sm:w-[180px] md:w-[200px] h-[40px] md:h-[55px] text-base md:text-lg font-medium text-[#29296E] bg-gray-300 rounded-full shadow-md hover:bg-gray-400 transition border border-gray-400">
+          <button
+            className="px-6 py-3 w-full sm:w-[180px] md:w-[200px] h-[40px] md:h-[55px] text-base md:text-lg font-medium text-[#29296E] bg-gray-300 rounded-full shadow-md hover:bg-gray-400 transition border border-gray-400"
+            onClick={handleLogIn}
+          >
             Log In
           </button>
 
