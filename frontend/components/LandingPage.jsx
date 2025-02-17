@@ -8,7 +8,6 @@ const LandingPage = () => {
   const router = useRouter();
 
   const handleLogIn = () => {
-    console.log("Log In clicked");
     router.push("/signup");
   };
 
