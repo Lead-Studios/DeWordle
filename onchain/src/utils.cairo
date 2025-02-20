@@ -71,3 +71,7 @@ pub fn compare_word(word: ByteArray, guessed_word: ByteArray) -> Span<u8> {
     // Return the final array of letter states
     word_states.span()
 }
+
+pub fn is_correct_word(correct_word: ByteArray, guessed_word: ByteArray) -> bool {
+    guessed_word == correct_word
+}

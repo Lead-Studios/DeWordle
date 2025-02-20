@@ -11,7 +11,7 @@ mod DeWordle {
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::introspection::src5::SRC5Component;
 
-    use dewordle::utils::compare_word;
+    use dewordle::utils::{compare_word, is_correct_word};
 
     const ADMIN_ROLE: felt252 = selector!("ADMIN_ROLE");
 
@@ -116,7 +116,7 @@ mod DeWordle {
             let daily_stat = self.daily_player_stat.read(caller);
             assert(!daily_stat.has_won, 'Player has already won');
             assert(daily_stat.attempt_remaining > 0, 'Player has exhausted attempts');
-            if self._is_correct_word(guessed_word.clone()) {
+            if is_correct_word(self.get_daily_word(), guessed_word.clone()) {
                 let new_daily_stat = DailyPlayerStat {
                     player: caller,
                     attempt_remaining: daily_stat.attempt_remaining - 1,
@@ -139,10 +139,5 @@ mod DeWordle {
     }
 
     #[generate_trait]
-    pub impl InternalFunctions of InternalFunctionsTrait {
-        fn _is_correct_word(self: @ContractState, guessed_word: ByteArray) -> bool {
-            let correct_word: ByteArray = self.word_of_the_day.read();
-            guessed_word == correct_word
-        }
-    }
+    pub impl InternalFunctions of InternalFunctionsTrait {}
 }

@@ -35,28 +35,6 @@ fn test_set_daily_word() {
 }
 
 #[test]
-fn test_is_correct_word() {
-    // Deploy the contract
-    let contract_address = deploy_contract();
-    let dewordle = IDeWordleDispatcher { contract_address: contract_address };
-
-    start_cheat_caller_address(contract_address, OWNER());
-    // Set the correct word in the contract state
-    let correct_word = "hello";
-    dewordle.set_daily_word(correct_word.clone());
-
-    // Test case 1: Correct guess
-    let guessed_word = "hello";
-    let result = dewordle.is_correct_word(guessed_word.clone());
-    assert(result, 'Test case 1 failed');
-
-    // Test case 2: Incorrect guess
-    let guessed_word = "world";
-    let result = dewordle.is_correct_word(guessed_word.clone());
-    assert(!result, 'Test case 2 failed');
-}
-
-#[test]
 fn test_play_initializes_daily_player_stat() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address: contract_address };

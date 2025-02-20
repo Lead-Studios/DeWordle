@@ -1,4 +1,4 @@
-use dewordle::utils::compare_word;
+use dewordle::utils::{compare_word, is_correct_word};
 
 #[test]
 fn test_compare_word_when_all_letters_are_correct() {
@@ -49,4 +49,19 @@ fn test_compare_word_when_some_letters_are_repeated() {
     assert(
         compare_word(daily_word, "less") == array![2, 0, 0, 2].span(), 'Word not compared correctly'
     );
+}
+
+#[test]
+fn test_is_correct_word() {
+    let correct_word = "hello";
+
+    // Test case 1: Correct guess
+    let guessed_word = "hello";
+    let result = is_correct_word(correct_word.clone(), guessed_word.clone());
+    assert(result, 'Test case 1 failed');
+
+    // Test case 2: Incorrect guess
+    let guessed_word = "world";
+    let result = is_correct_word(correct_word, guessed_word.clone());
+    assert(!result, 'Test case 2 failed');
 }
