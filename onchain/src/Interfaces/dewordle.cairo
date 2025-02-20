@@ -9,8 +9,6 @@ pub trait IDeWordle<TContractState> {
     fn play(ref self: TContractState);
 
     fn submit_guess(ref self: TContractState, guessed_word: ByteArray) -> Option<Span<u8>>;
-    fn is_correct_word(ref self: TContractState, guessed_word: ByteArray) -> bool;
-    fn compare_word(ref self: TContractState, guessed_word: ByteArray) -> Span<u8>;
 }
 
 #[derive(Drop, Serde, starknet::Store)]

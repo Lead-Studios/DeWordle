@@ -1,6 +1,6 @@
 #[starknet::contract]
 mod DeWordle {
-    use dewordle::interfaces::{IDeWordle, PlayerStat, DailyPlayerStat};
+    use dewordle::interfaces::dewordle::{IDeWordle, PlayerStat, DailyPlayerStat};
 
     use starknet::{ContractAddress};
 
@@ -11,7 +11,7 @@ mod DeWordle {
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::introspection::src5::SRC5Component;
 
-    use dewordle::constants::LetterStates::{CORRECT, PRESENT, ABSENT};
+    use dewordle::utils::compare_word;
 
     const ADMIN_ROLE: felt252 = selector!("ADMIN_ROLE");
 
@@ -116,7 +116,7 @@ mod DeWordle {
             let daily_stat = self.daily_player_stat.read(caller);
             assert(!daily_stat.has_won, 'Player has already won');
             assert(daily_stat.attempt_remaining > 0, 'Player has exhausted attempts');
-            if self.is_correct_word(guessed_word.clone()) {
+            if self._is_correct_word(guessed_word.clone()) {
                 let new_daily_stat = DailyPlayerStat {
                     player: caller,
                     attempt_remaining: daily_stat.attempt_remaining - 1,
@@ -133,87 +133,16 @@ mod DeWordle {
                     won_at_attempt: 0,
                 };
                 self.daily_player_stat.write(caller, new_daily_stat);
-                Option::Some(self.compare_word(guessed_word.clone()))
+                Option::Some(compare_word(self.get_daily_word(), guessed_word.clone()))
             }
         }
+    }
 
-
-        fn is_correct_word(ref self: ContractState, guessed_word: ByteArray) -> bool {
+    #[generate_trait]
+    pub impl InternalFunctions of InternalFunctionsTrait {
+        fn _is_correct_word(self: @ContractState, guessed_word: ByteArray) -> bool {
             let correct_word: ByteArray = self.word_of_the_day.read();
             guessed_word == correct_word
-        }
-
-        fn compare_word(ref self: ContractState, guessed_word: ByteArray) -> Span<u8> {
-            let guessed_word_len = guessed_word.len();
-            let word = self.get_daily_word();
-
-            assert(guessed_word_len == word.len(), 'Length does not match');
-
-            //  Initialize tracking arrays
-            let mut i = 0;
-            let mut word_states = array![]; // Final letter states
-            let mut temp_states = array![]; // Temporary states to track exact matches
-            let mut letter_count_list = array![]; // To track letter frequency in the target word
-
-            //  Count occurrences of each letter in the daily word
-            while (i < guessed_word_len) {
-                let mut count: u32 = 0;
-                let mut j = 0;
-                while (j < guessed_word_len) {
-                    if (word[i] == word[j]) {
-                        count += 1; // Count occurrences of the letter
-                    }
-                    j += 1;
-                };
-                letter_count_list.append(count);
-                i += 1;
-            };
-
-            i = 0;
-
-            //  Identify exact matches and mark temporary state
-            while (i < guessed_word_len) {
-                if (guessed_word[i] == word[i]) {
-                    temp_states.append(CORRECT); // Letter is in the correct position
-                } else {
-                    temp_states.append(ABSENT); // Default to ABSENT for now
-                }
-                i += 1;
-            };
-
-            i = 0;
-
-            //  Identify misplaced letters
-            while (i < guessed_word_len) {
-                let prev_word_states = word_states.clone();
-                // If the letter was marked ABSENT in the temporary states, check for misplaced
-                // occurrences
-                if (*temp_states.at(i) == ABSENT) {
-                    let mut j = 0;
-                    while (j < guessed_word_len) {
-                        if (guessed_word[i] == word[j]) {
-                            if (*temp_states.at(j) != CORRECT) {
-                                word_states.append(PRESENT); // Mark as PRESENT (misplaced)
-                                break;
-                            }
-                        }
-                        j += 1;
-                    };
-
-                    // If no match was found, mark as ABSENT
-                    if (prev_word_states.len() == word_states.len()) {
-                        word_states.append(ABSENT);
-                    }
-                } else {
-                    // If the letter was previously marked as CORRECT, preserve the state
-                    word_states.append(CORRECT);
-                }
-
-                i += 1;
-            };
-
-            // Return the final array of letter states
-            word_states.span()
         }
     }
 }
