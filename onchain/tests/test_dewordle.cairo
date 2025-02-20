@@ -1,9 +1,9 @@
-use starknet::ContractAddress;
+use dewordle::interfaces::dewordle::{IDeWordleDispatcher, IDeWordleDispatcherTrait};
 use snforge_std::{
     declare, ContractClassTrait, DeclareResultTrait, start_cheat_caller_address,
     stop_cheat_caller_address
 };
-use dewordle::interfaces::dewordle::{IDeWordleDispatcher, IDeWordleDispatcherTrait};
+use starknet::ContractAddress;
 
 fn OWNER() -> ContractAddress {
     'OWNER'.try_into().unwrap()

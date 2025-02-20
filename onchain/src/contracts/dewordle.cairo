@@ -2,16 +2,16 @@
 pub mod DeWordle {
     use dewordle::interfaces::dewordle::{IDeWordle, PlayerStat, DailyPlayerStat};
 
-    use starknet::{ContractAddress};
-
-    use starknet::storage::{
-        StoragePointerReadAccess, StoragePointerWriteAccess, Map, Vec, MutableVecTrait,
-    };
+    use dewordle::utils::{compare_word, is_correct_word};
     use openzeppelin::access::accesscontrol::{AccessControlComponent};
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::introspection::src5::SRC5Component;
 
-    use dewordle::utils::{compare_word, is_correct_word};
+    use starknet::storage::{
+        StoragePointerReadAccess, StoragePointerWriteAccess, Map, Vec, MutableVecTrait,
+    };
+
+    use starknet::{ContractAddress};
 
     const ADMIN_ROLE: felt252 = selector!("ADMIN_ROLE");
 
