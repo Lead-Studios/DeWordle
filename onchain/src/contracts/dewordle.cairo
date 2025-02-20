@@ -1,5 +1,5 @@
 #[starknet::contract]
-mod DeWordle {
+pub mod DeWordle {
     use dewordle::interfaces::dewordle::{IDeWordle, PlayerStat, DailyPlayerStat};
 
     use starknet::{ContractAddress};
