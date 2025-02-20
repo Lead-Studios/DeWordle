@@ -1,6 +1,6 @@
 #[starknet::contract]
 pub mod DeWordle {
-    use dewordle::interfaces::dewordle::{IDeWordle, PlayerStat, DailyPlayerStat};
+    use dewordle::interfaces::{IDeWordle, PlayerStat, DailyPlayerStat};
 
     use dewordle::utils::{compare_word, is_correct_word};
     use openzeppelin::access::accesscontrol::{AccessControlComponent};

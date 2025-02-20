@@ -1,4 +1,4 @@
-use dewordle::interfaces::dewordle::{IDeWordleDispatcher, IDeWordleDispatcherTrait};
+use dewordle::interfaces::{IDeWordleDispatcher, IDeWordleDispatcherTrait};
 use snforge_std::{
     declare, ContractClassTrait, DeclareResultTrait, start_cheat_caller_address,
     stop_cheat_caller_address
