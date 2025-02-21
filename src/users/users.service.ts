@@ -88,7 +88,6 @@ export class UsersService {
       }
     }
     
-    // Ensure only specified fields are updated, excluding id
     const allowedUpdates = ['name', 'email'];
     for (const key of Object.keys(updateUserDto)) {
       if (allowedUpdates.includes(key)) {
