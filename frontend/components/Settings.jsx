@@ -4,9 +4,12 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import { Switch } from "@headlessui/react";
 import Copywrite from "./Copywrite";
+import { useTheme } from "../context/ThemeContext";
 
 export const Setting = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
+
+  const { isDarkMode, toggleDarkMode } = useTheme();
 
   const [enabled, setEnabled] = useState({
     "Hard Mode": false,
@@ -16,16 +19,8 @@ export const Setting = ({ isOpen, onClose }) => {
   });
 
   const handleDarkModeToggle = () => {
-    setEnabled((prev) => {
-      const newEnabled = { ...prev, "Dark Theme": !prev["Dark Theme"] };
-      const newMode = newEnabled["Dark Theme"];
-
-      // Update theme in localStorage and globally
-      localStorage.setItem("theme", newMode ? "dark" : "light");
-      document.documentElement.classList.toggle("dark", newMode);
-
-      return newEnabled;
-    });
+    toggleDarkMode();
+    setEnabled((prev) => ({ ...prev, "Dark Theme": !prev["Dark Theme"] }));
   };
 
   // Static setting data
