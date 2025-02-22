@@ -28,6 +28,6 @@ import { RefreshTokenProvider } from './providers/refresh-token.provider';
     GenerateTokenProvider,
     RefreshTokenProvider,
   ],
-  exports: [HashingProvider],
+  exports: [HashingProvider, AuthService],
 })
 export class AuthModule {}

@@ -52,7 +52,8 @@ export class CreateUsersProvider {
     );
 
     const newUser = this.userRepository.create({
-      ...createUserDto,
+      email: createUserDto.email,
+      userName: createUserDto.userName,
       password: hashedPassword,
     });
 
