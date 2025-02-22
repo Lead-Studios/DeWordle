@@ -11,6 +11,6 @@ import { FindOneByEmailProvider } from './providers/find-one-by-email.provider';
   imports: [forwardRef(() => AuthModule), TypeOrmModule.forFeature([User])],
   controllers: [UsersController],
   providers: [UsersService, CreateUsersProvider, FindOneByEmailProvider],
-  exports: [UsersService],
+  exports: [UsersService, TypeOrmModule.forFeature([User])],
 })
 export class UsersModule {}

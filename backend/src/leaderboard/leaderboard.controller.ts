@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  HttpCode,
+} from '@nestjs/common';
 import { LeaderboardService } from './leaderboard.service';
 import { CreateLeaderboardDto } from './dto/create-leaderboard.dto';
 import { UpdateLeaderboardDto } from './dto/update-leaderboard.dto';
@@ -23,8 +33,12 @@ export class LeaderboardController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLeaderboardDto: UpdateLeaderboardDto) {
-    return this.leaderboardService.update(+id, updateLeaderboardDto);
+  @HttpCode(200)
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDto: UpdateLeaderboardDto,
+  ) {
+    return this.leaderboardService.update(id, updateDto);
   }
 
   @Delete(':id')
