@@ -1,11 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { CreateLeaderboardDto } from './dto/create-leaderboard.dto';
 import { UpdateLeaderboardDto } from './dto/update-leaderboard.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Leaderboard } from './entities/leaderboard.entity';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class LeaderboardService {
-  create(createLeaderboardDto: CreateLeaderboardDto) {
-    return 'This action adds a new leaderboard';
+  constructor(
+    @InjectRepository(Leaderboard)
+    private leaderboardRepository: Repository<Leaderboard>,
+
+    private readonly userServices: UsersService,
+  ) {}
+  async createLeaderboard(
+    createLeaderboardDto: CreateLeaderboardDto,
+  ): Promise<Leaderboard> {
+    const user = await this.userServices.findOneById(
+      createLeaderboardDto.userId,
+    );
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const leaderboardEntry = this.leaderboardRepository.create({
+      ...createLeaderboardDto,
+      userId: user,
+    });
+    return this.leaderboardRepository.save(leaderboardEntry);
   }
 
   findAll() {

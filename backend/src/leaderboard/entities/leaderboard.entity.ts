@@ -1,10 +1,5 @@
 import { User } from 'src/users/entities/user.entity';
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Leaderboard {
@@ -14,7 +9,10 @@ export class Leaderboard {
   @ManyToOne(() => User, (user) => user.leaderboard)
   userId: User;
 
-  @ManyToOne(() => User, (user) => user.leaderboard, { onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => User, (user) => user.leaderboard, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
   user: User;
 
   @Column('integer')
@@ -26,4 +24,3 @@ export class Leaderboard {
   @Column('float')
   averageScore: number;
 }
-

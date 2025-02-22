@@ -8,7 +8,13 @@ import { AdminModule } from './admin/admin.module';
 import { ResultModule } from './result/result.module';
 
 @Module({
-  imports: [UsersModule, AuthModule, LeaderboardModule, AdminModule, ResultModule],
+  imports: [
+    UsersModule,
+    AuthModule,
+    LeaderboardModule,
+    AdminModule,
+    ResultModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
