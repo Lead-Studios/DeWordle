@@ -25,11 +25,13 @@ export class User {
 
   @OneToMany(() => Result, (result) => result.user, {
     cascade: true,
+    eager: true,
   })
   result: Result[];
 
   @OneToMany(() => Leaderboard, (leaderboard) => leaderboard.user, {
     cascade: true,
+    eager: true,
   })
   leaderboard: Leaderboard[];
 
