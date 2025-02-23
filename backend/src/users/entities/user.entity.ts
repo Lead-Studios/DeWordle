@@ -23,10 +23,16 @@ export class User {
   @Column('varchar', { nullable: false })
   password: string;
 
-  @OneToMany(() => Result, (result) => result.user, { cascade: true, eager: true })
+  @OneToMany(() => Result, (result) => result.user, {
+    cascade: true,
+    eager: true,
+  })
   result: Result[];
 
-  @OneToMany(() => Leaderboard, (leaderboard) => leaderboard.user, { cascade: true, eager: true })
+  @OneToMany(() => Leaderboard, (leaderboard) => leaderboard.user, {
+    cascade: true,
+    eager: true,
+  })
   leaderboard: Leaderboard[];
 
   @CreateDateColumn()
@@ -38,4 +44,3 @@ export class User {
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
 }
-
