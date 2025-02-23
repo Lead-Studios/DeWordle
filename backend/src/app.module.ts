@@ -17,11 +17,13 @@ import { validate } from '../config/env.validation';
     LeaderboardModule,
     AdminModule,
     ResultModule,
+
     ConfigModule.forRoot({
       isGlobal: true,
       load: [envConfiguration],
       validate,
     }),
+
   ],
   controllers: [AppController],
   providers: [AppService],
