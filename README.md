@@ -1,151 +1,99 @@
-# DeWordle
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+</p>
 
-DeWordle is a decentralized, blockchain-based word-guessing game built on the StarkNet ecosystem. It merges the fun and challenge of Wordle with the transparency and security of blockchain technology.
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-## Features
+  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+    <p align="center">
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
+<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
+<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
+<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
+<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
+<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
+  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
+    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
+  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+</p>
+  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
+  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-- **Daily Decentralized Word Challenges**: A new word is generated every day and stored securely on-chain.
-- **Transparent Gameplay**: Game logic is stored on the blockchain, ensuring fair and verifiable outcomes.
-- **Wallet Integration**: Compatible with StarkNet wallets like Argent X for gameplay interactions.
-- **On-Chain Rewards**: Players earn tokens or NFTs for successful guesses or streaks.
-- **Leaderboards**: Track top players with a decentralized leaderboard.
+## Description
 
-## Tech Stack
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-### Frontend
-
-- **Framework**: Next.js (React-based)
-- **Styling**: Tailwind CSS for a sleek and responsive design.
-- **Wallet Integration**: `starknet.js` for connecting to StarkNet wallets.
-
-### Smart Contracts
-
-- **Language**: Cairo for StarkNet smart contract development.
-- **Features**:
-  - On-chain storage for the word of the day.
-  - Validation of guesses with feedback on correctness.
-  - Reward distribution for streaks or successful games.
-
-### Backend & Storage
-
-- **Storage**: IPFS for off-chain metadata (e.g., leaderboard details).
-- **Database**: Metadata stored on-chain to ensure decentralization.
-
-### Deployment
-
-- **Frontend Hosting**: Vercel for hosting the Next.js application.
-- **Blockchain**: StarkNet for smart contract deployment.
-
-## Installation
-
-### Clone the Repository
+## Project setup
 
 ```bash
-git clone https://github.com/your-username/dewordle.git
-cd dewordle
+$ npm install
 ```
 
-### Frontend Setup
+## Compile and run the project
 
 ```bash
-cd frontend
-npm install
-npm run dev
+# development
+$ npm run start
+
+# watch mode
+$ npm run start:dev
+
+# production mode
+$ npm run start:prod
 ```
 
-### Smart Contract Compilation
+## Run tests
 
 ```bash
-cd contracts
-starknet-compile wordle_contract.cairo --output wordle_contract_compiled.json
+# unit tests
+$ npm run test
+
+# e2e tests
+$ npm run test:e2e
+
+# test coverage
+$ npm run test:cov
 ```
 
-### Smart Contract Deployment
+## Deployment
+
+When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+
+If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
 
 ```bash
-starknet deploy --contract wordle_contract_compiled.json --network alpha
+$ npm install -g mau
+$ mau deploy
 ```
 
-### Environment Variables
+With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 
-Create a `.env` file in the `frontend` directory with the following variables:
+## Resources
 
-```
-NEXT_PUBLIC_STARKNET_NETWORK=alpha
-NEXT_PUBLIC_CONTRACT_ADDRESS=your-deployed-contract-address
-```
+Check out a few resources that may come in handy when working with NestJS:
 
-## Project Structure
+- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
+- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
+- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
+- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
+- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
+- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
+- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
+- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
 
-```
-dewordle/
-├── contracts/          # StarkNet Cairo contracts
-├── frontend/           # Next.js application
-├── README.md           # Project documentation
-└── .env                # Environment variables
-```
+## Support
 
-## Workflow
+Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-1. **Login**: Users connect their StarkNet wallet.
-2. **Play**:
-   - Guess the word of the day within 6 attempts.
-   - Receive feedback on correct letters and positions.
-3. **Rewards**:
-   - Earn tokens or NFTs for successful guesses and streaks.
-4. **Leaderboard**:
-   - Track top players and their achievements on a decentralized leaderboard.
-5. **Blockchain Integration**:
-   - Transactions signed via StarkNet wallets.
-   - Game logic and rewards managed through smart contracts.
+## Stay in touch
 
-## Development Roadmap
-
-### MVP Development
-
-- Implement core gameplay mechanics (word guessing and feedback).
-- Integrate wallet connection and transaction signing.
-- Deploy smart contracts for word storage and validation.
-- Build a minimal leaderboard.
-
-### Advanced Features
-
-- **Streak Rewards**: Enhanced rewards for consecutive wins.
-- **Social Sharing**: Share scores and achievements directly from the app.
-- **NFT Integration**: Mint unique NFTs for rare achievements.
-- **Advanced Leaderboards**: Global rankings with filters for streaks, rewards, and participation.
-- **Custom Game Modes**: Allow players to create private games.
-
-### Launch
-
-- Deploy smart contracts on StarkNet mainnet.
-- Host the application on Vercel or similar services.
-
-## Contributing
-
-1. Fork the repository.
-2. Create a feature branch:
-   ```bash
-   git checkout -b feature-name
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m "Add feature"
-   ```
-4. Push to the branch:
-   ```bash
-   git push origin feature-name
-   ```
-5. Open a pull request.
+- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
+- Website - [https://nestjs.com](https://nestjs.com/)
+- Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
-
-## Contact
-
-For inquiries, reach out to us on TG at [https://t.me/DeWprdle](https://t.me/+GNI5Wz3xioZhYzE8).
-
----
-
-**Built for fun, fairness, and decentralization!**
+Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
