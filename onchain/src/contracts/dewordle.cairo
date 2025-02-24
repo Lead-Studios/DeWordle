@@ -1,6 +1,7 @@
 #[starknet::contract]
 pub mod DeWordle {
     use dewordle::interfaces::{IDeWordle, PlayerStat, DailyPlayerStat};
+    use dewordle::constants::LetterState;
 
     use dewordle::utils::{compare_word, is_correct_word};
     use openzeppelin::access::accesscontrol::{AccessControlComponent};
@@ -110,7 +111,7 @@ pub mod DeWordle {
             self.daily_player_stat.write(caller, new_daily_stat);
         }
 
-        fn submit_guess(ref self: ContractState, guessed_word: ByteArray) -> Option<Span<u8>> {
+        fn submit_guess(ref self: ContractState, guessed_word: ByteArray) -> Option<Span<LetterState>> {
             assert(guessed_word.len() == self.word_len.read().into(), 'Length does not match');
             let caller = starknet::get_caller_address();
             let daily_stat = self.daily_player_stat.read(caller);

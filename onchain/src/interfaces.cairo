@@ -1,4 +1,5 @@
 use starknet::ContractAddress;
+use dewordle::constants::LetterState;
 
 #[starknet::interface]
 pub trait IDeWordle<TContractState> {
@@ -8,7 +9,7 @@ pub trait IDeWordle<TContractState> {
     fn get_player_daily_stat(self: @TContractState, player: ContractAddress) -> DailyPlayerStat;
     fn play(ref self: TContractState);
 
-    fn submit_guess(ref self: TContractState, guessed_word: ByteArray) -> Option<Span<u8>>;
+    fn submit_guess(ref self: TContractState, guessed_word: ByteArray) -> Option<Span<LetterState>>;
 }
 
 #[derive(Drop, Serde, starknet::Store)]

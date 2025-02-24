@@ -1,6 +1,6 @@
-use dewordle::constants::LetterStates::{CORRECT, PRESENT, ABSENT};
+use dewordle::constants::LetterState;
 
-pub fn compare_word(word: ByteArray, guessed_word: ByteArray) -> Span<u8> {
+pub fn compare_word(word: ByteArray, guessed_word: ByteArray) -> Span<LetterState> {
     let guessed_word_len = guessed_word.len();
 
     assert(guessed_word_len == word.len(), 'Length does not match');
@@ -30,9 +30,9 @@ pub fn compare_word(word: ByteArray, guessed_word: ByteArray) -> Span<u8> {
     //  Identify exact matches and mark temporary state
     while (i < guessed_word_len) {
         if (guessed_word[i] == word[i]) {
-            temp_states.append(CORRECT); // Letter is in the correct position
+            temp_states.append(LetterState::CORRECT); // Letter is in the correct position
         } else {
-            temp_states.append(ABSENT); // Default to ABSENT for now
+            temp_states.append(LetterState::ABSENT); // Default to ABSENT for now
         }
         i += 1;
     };
@@ -44,12 +44,12 @@ pub fn compare_word(word: ByteArray, guessed_word: ByteArray) -> Span<u8> {
         let prev_word_states = word_states.clone();
         // If the letter was marked ABSENT in the temporary states, check for misplaced
         // occurrences
-        if (*temp_states.at(i) == ABSENT) {
+        if (*temp_states.at(i) == LetterState::ABSENT) {
             let mut j = 0;
             while (j < guessed_word_len) {
                 if (guessed_word[i] == word[j]) {
-                    if (*temp_states.at(j) != CORRECT) {
-                        word_states.append(PRESENT); // Mark as PRESENT (misplaced)
+                    if (*temp_states.at(j) != LetterState::CORRECT) {
+                        word_states.append(LetterState::PRESENT); // Mark as PRESENT (misplaced)
                         break;
                     }
                 }
@@ -58,11 +58,11 @@ pub fn compare_word(word: ByteArray, guessed_word: ByteArray) -> Span<u8> {
 
             // If no match was found, mark as ABSENT
             if (prev_word_states.len() == word_states.len()) {
-                word_states.append(ABSENT);
+                word_states.append(LetterState::ABSENT);
             }
         } else {
             // If the letter was previously marked as CORRECT, preserve the state
-            word_states.append(CORRECT);
+            word_states.append(LetterState::CORRECT);
         }
 
         i += 1;

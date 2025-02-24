@@ -4,7 +4,7 @@ pub mod LetterStates {
     pub const ABSENT: u8 = 2;
 }
 
-#[derive(PartialEq, Drop)]
+#[derive(PartialEq, Copy, Drop, Serde)]
 pub enum LetterState {
     CORRECT,
     PRESENT,
