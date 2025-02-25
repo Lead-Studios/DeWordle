@@ -1,4 +1,4 @@
-use dewordle::constants::{LetterState, LetterStateIntoU8, U8IntoLetterState};
+use dewordle::constants::{LetterState, LetterStateIntoU8, U8TryIntoLetterState};
 
 #[test]
 fn test_convert_letterstate_into_u8() {

@@ -15,7 +15,7 @@ pub impl LetterStateIntoU8 of Into<LetterState, u8> {
     }
 }
 
-pub impl U8IntoLetterState of TryInto<u8, LetterState> {
+pub impl U8TryIntoLetterState of TryInto<u8, LetterState> {
     fn try_into(self: u8) -> Option<LetterState> {
         match self {
             0 => Option::Some(LetterState::CORRECT),
