@@ -1,12 +1,18 @@
-use dewordle::utils::{compare_word, is_correct_word};
 use dewordle::constants::LetterState;
+use dewordle::utils::{compare_word, is_correct_word};
 
 #[test]
 fn test_compare_word_when_all_letters_are_correct() {
     let daily_word = "test";
 
     assert(
-        compare_word(daily_word, "test") == array![LetterState::CORRECT, LetterState::CORRECT, LetterState::CORRECT, LetterState::CORRECT].span(), 'Word not compared correctly'
+        compare_word(
+            daily_word, "test"
+        ) == array![
+            LetterState::CORRECT, LetterState::CORRECT, LetterState::CORRECT, LetterState::CORRECT
+        ]
+            .span(),
+        'Word not compared correctly'
     );
 }
 
@@ -15,7 +21,13 @@ fn test_compare_word_when_some_letters_are_misplaced() {
     let daily_word = "test";
 
     assert(
-        compare_word(daily_word, "tset") == array![LetterState::CORRECT, LetterState::PRESENT, LetterState::PRESENT, LetterState::CORRECT].span(), 'Word not compared correctly'
+        compare_word(
+            daily_word, "tset"
+        ) == array![
+            LetterState::CORRECT, LetterState::PRESENT, LetterState::PRESENT, LetterState::CORRECT
+        ]
+            .span(),
+        'Word not compared correctly'
     );
 }
 
@@ -24,7 +36,13 @@ fn test_compare_word_when_some_letters_are_absent() {
     let daily_word = "test";
 
     assert(
-        compare_word(daily_word, "tsec") == array![LetterState::CORRECT, LetterState::PRESENT, LetterState::PRESENT, LetterState::ABSENT].span(), 'Word not compared correctly'
+        compare_word(
+            daily_word, "tsec"
+        ) == array![
+            LetterState::CORRECT, LetterState::PRESENT, LetterState::PRESENT, LetterState::ABSENT
+        ]
+            .span(),
+        'Word not compared correctly'
     );
 }
 
@@ -41,14 +59,29 @@ fn test_compare_word_when_some_letters_are_repeated() {
     let daily_word = "slept";
 
     assert(
-        compare_word(daily_word, "sweep") == array![LetterState::CORRECT, LetterState::ABSENT, LetterState::CORRECT, LetterState::ABSENT, LetterState::PRESENT].span(),
+        compare_word(
+            daily_word, "sweep"
+        ) == array![
+            LetterState::CORRECT,
+            LetterState::ABSENT,
+            LetterState::CORRECT,
+            LetterState::ABSENT,
+            LetterState::PRESENT
+        ]
+            .span(),
         'Word not compared correctly'
     );
 
     let daily_word = "test";
 
     assert(
-        compare_word(daily_word, "less") == array![LetterState::ABSENT, LetterState::CORRECT, LetterState::CORRECT, LetterState::ABSENT].span(), 'Word not compared correctly'
+        compare_word(
+            daily_word, "less"
+        ) == array![
+            LetterState::ABSENT, LetterState::CORRECT, LetterState::CORRECT, LetterState::ABSENT
+        ]
+            .span(),
+        'Word not compared correctly'
     );
 }
 

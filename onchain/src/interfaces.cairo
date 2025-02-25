@@ -1,5 +1,5 @@
-use starknet::ContractAddress;
 use dewordle::constants::LetterState;
+use starknet::ContractAddress;
 
 #[starknet::interface]
 pub trait IDeWordle<TContractState> {
