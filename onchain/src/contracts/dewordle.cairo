@@ -3,13 +3,13 @@ pub mod DeWordle {
     use dewordle::constants::LetterState;
     use dewordle::interfaces::{IDeWordle, PlayerStat, DailyPlayerStat};
 
-    use dewordle::utils::{compare_word, is_correct_word};
+    use dewordle::utils::{compare_word, is_correct_hashed_word, hash_word, hash_letter};
     use openzeppelin::access::accesscontrol::{AccessControlComponent};
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::introspection::src5::SRC5Component;
 
     use starknet::storage::{
-        StoragePointerReadAccess, StoragePointerWriteAccess, Map, Vec, MutableVecTrait,
+        StoragePointerReadAccess, StoragePointerWriteAccess, Map, Vec, VecTrait, MutableVecTrait,
     };
 
     use starknet::{ContractAddress};
@@ -37,7 +37,7 @@ pub mod DeWordle {
 
     #[storage]
     struct Storage {
-        word_of_the_day: ByteArray, //TODO: hash word
+        word_of_the_day: felt252, //TODO: hash word
         letters_in_word: Vec<felt252>, //TODO: hash letters
         word_len: u8,
         player_stat: Map<ContractAddress, PlayerStat>,
@@ -73,19 +73,34 @@ pub mod DeWordle {
         fn set_daily_word(ref self: ContractState, word: ByteArray) {
             self.accesscontrol.assert_only_role(ADMIN_ROLE);
             let word_len = word.len();
+            let hash_word = hash_word(word.clone());
+            self.word_of_the_day.write(hash_word);
             let mut i = 0;
 
             while (i < word_len) {
-                self.letters_in_word.append().write(word[i].into());
+                let hashed_letter = hash_letter(word[i].into());
+                self.letters_in_word.append().write(hashed_letter);
                 i += 1;
             };
-            self.word_of_the_day.write(word);
+
             self.word_len.write(word_len.try_into().unwrap());
         }
 
-        fn get_daily_word(self: @ContractState) -> ByteArray {
+        fn get_daily_word(self: @ContractState) -> felt252 {
             self.accesscontrol.assert_only_role(ADMIN_ROLE);
             self.word_of_the_day.read()
+        }
+
+        fn get_daily_letters(self: @ContractState) -> Array<felt252> {
+            self.accesscontrol.assert_only_role(ADMIN_ROLE);
+            let mut letter_arr = array![];
+            for i in 0
+                ..self
+                    .letters_in_word
+                    .len() {
+                        letter_arr.append(self.letters_in_word.at(i).read());
+                    };
+            letter_arr
         }
 
         fn get_player_daily_stat(self: @ContractState, player: ContractAddress) -> DailyPlayerStat {
@@ -119,7 +134,8 @@ pub mod DeWordle {
             let daily_stat = self.daily_player_stat.read(caller);
             assert(!daily_stat.has_won, 'Player has already won');
             assert(daily_stat.attempt_remaining > 0, 'Player has exhausted attempts');
-            if is_correct_word(self.get_daily_word(), guessed_word.clone()) {
+            let hash_guessed_word = hash_word(guessed_word.clone());
+            if is_correct_hashed_word(self.get_daily_word(), hash_guessed_word) {
                 let new_daily_stat = DailyPlayerStat {
                     player: caller,
                     attempt_remaining: daily_stat.attempt_remaining - 1,
@@ -136,7 +152,7 @@ pub mod DeWordle {
                     won_at_attempt: 0,
                 };
                 self.daily_player_stat.write(caller, new_daily_stat);
-                Option::Some(compare_word(self.get_daily_word(), guessed_word.clone()))
+                Option::Some(compare_word(self.get_daily_letters(), guessed_word.clone()))
             }
         }
     }
