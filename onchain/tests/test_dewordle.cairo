@@ -1,8 +1,8 @@
 use dewordle::interfaces::{IDeWordleDispatcher, IDeWordleDispatcherTrait};
-use dewordle::utils::{compare_word, is_correct_hashed_word, hash_word, hash_letter};
+use dewordle::utils::{hash_word, hash_letter};
 use snforge_std::{
     declare, ContractClassTrait, DeclareResultTrait, start_cheat_caller_address,
-    stop_cheat_caller_address
+    stop_cheat_caller_address , cheat_block_timestamp ,CheatSpan,
 };
 use starknet::ContractAddress;
 
@@ -369,6 +369,26 @@ fn test_get_daily_letters() {
     for i in 0..word.len() {
         assert(stored_letters[i] == word[i], 'Mismatched letter hash');
     };
+
+    stop_cheat_caller_address(contract_address);
+}
+
+#[test]
+fn test_update_end_of_day() {
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address };
+    start_cheat_caller_address(contract_address, OWNER());
+
+    // Get initial timestamp
+    let initial_timestamp = dewordle.get_end_of_day_timestamp();
+
+    // Fast forward time by one day
+    cheat_block_timestamp(contract_address, starknet::get_block_timestamp() + 86400, CheatSpan::TargetCalls(1));
+    dewordle.update_end_of_day();
+
+    // Verify update
+    let updated_timestamp = dewordle.get_end_of_day_timestamp();
+    assert(updated_timestamp == initial_timestamp + 86400, 'timestamp not updated correctly');
 
     stop_cheat_caller_address(contract_address);
 }

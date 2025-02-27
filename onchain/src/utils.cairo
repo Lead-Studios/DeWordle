@@ -1,5 +1,7 @@
 use core::pedersen::{pedersen};
 use dewordle::constants::LetterState;
+use starknet::{get_block_timestamp};
+const SECONDS_IN_A_DAY: u64 = 86400;
 
 pub fn compare_word(letters: Array<felt252>, guessed_word: ByteArray) -> Span<LetterState> {
     let guessed_word_len = guessed_word.len();
@@ -88,4 +90,10 @@ pub fn hash_word(word: ByteArray) -> felt252 {
 
 pub fn hash_letter(letter: felt252) -> felt252 {
     pedersen(letter, 0)
+}
+
+pub fn get_next_midnight_timestamp() -> u64 {
+    let current_timestamp = get_block_timestamp();
+    let seconds_since_midnight = current_timestamp % SECONDS_IN_A_DAY;
+    current_timestamp - seconds_since_midnight + SECONDS_IN_A_DAY
 }

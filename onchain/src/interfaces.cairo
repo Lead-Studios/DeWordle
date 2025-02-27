@@ -11,6 +11,8 @@ pub trait IDeWordle<TContractState> {
     fn play(ref self: TContractState);
 
     fn submit_guess(ref self: TContractState, guessed_word: ByteArray) -> Option<Span<LetterState>>;
+    fn update_end_of_day(ref self: TContractState);
+    fn get_end_of_day_timestamp(self : @TContractState )-> u64 ;
 }
 
 #[derive(Drop, Serde, starknet::Store)]

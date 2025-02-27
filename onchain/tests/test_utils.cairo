@@ -1,5 +1,7 @@
 use dewordle::constants::LetterState;
-use dewordle::utils::{compare_word, is_correct_hashed_word, hash_word, hash_letter};
+use dewordle::utils::{compare_word, is_correct_hashed_word, hash_word, hash_letter , get_next_midnight_timestamp};
+use starknet::{get_block_timestamp};
+const SECONDS_IN_A_DAY: u64 = 86400;
 
 #[test]
 fn test_compare_word_when_all_letters_are_correct() {
@@ -152,4 +154,13 @@ fn test_hash_word() {
 
     assert!(hash1 != hash2, "Different words");
     assert!(hash1 == hash_word(word1), "Same word");
+}
+
+#[test]
+fn test_get_next_midnight_timestamp() {
+    let current_timestamp = get_block_timestamp();
+    let expected_midnight = get_next_midnight_timestamp();
+    
+    assert(expected_midnight > current_timestamp, 'Midnight must be in future');
+    assert(expected_midnight % SECONDS_IN_A_DAY == 0,'Must align with day boundary');
 }

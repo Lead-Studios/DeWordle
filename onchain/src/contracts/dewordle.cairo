@@ -3,7 +3,7 @@ pub mod DeWordle {
     use dewordle::constants::LetterState;
     use dewordle::interfaces::{IDeWordle, PlayerStat, DailyPlayerStat};
 
-    use dewordle::utils::{compare_word, is_correct_hashed_word, hash_word, hash_letter};
+    use dewordle::utils::{compare_word, is_correct_hashed_word, hash_word, hash_letter , get_next_midnight_timestamp};
     use openzeppelin::access::accesscontrol::{AccessControlComponent};
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::introspection::src5::SRC5Component;
@@ -12,9 +12,10 @@ pub mod DeWordle {
         StoragePointerReadAccess, StoragePointerWriteAccess, Map, Vec, VecTrait, MutableVecTrait,
     };
 
-    use starknet::{ContractAddress};
+    use starknet::{ContractAddress, get_block_timestamp};
 
     const ADMIN_ROLE: felt252 = selector!("ADMIN_ROLE");
+    const SECONDS_IN_A_DAY: u64 = 86400;
 
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
@@ -37,11 +38,12 @@ pub mod DeWordle {
 
     #[storage]
     struct Storage {
-        word_of_the_day: felt252, //TODO: hash word
+        word_of_the_day: felt252,
         letters_in_word: Vec<felt252>, //TODO: hash letters
         word_len: u8,
         player_stat: Map<ContractAddress, PlayerStat>,
         daily_player_stat: Map<ContractAddress, DailyPlayerStat>, // TODO: track day
+        end_of_day_timestamp: u64,
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
         #[substorage(v0)]
@@ -59,6 +61,7 @@ pub mod DeWordle {
         OwnableEvent: OwnableComponent::Event,
         #[flat]
         AccessControlEvent: AccessControlComponent::Event,
+        DayUpdated: DayUpdated,
     }
 
     #[constructor]
@@ -66,6 +69,13 @@ pub mod DeWordle {
         self.ownable.initializer(owner);
         self.accesscontrol.initializer();
         self.accesscontrol._grant_role(ADMIN_ROLE, owner);
+        let midnight_timestamp =get_next_midnight_timestamp();
+        self.end_of_day_timestamp.write(midnight_timestamp);
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct DayUpdated {
+        new_end_of_day: u64,
     }
 
     #[abi(embed_v0)]
@@ -154,6 +164,18 @@ pub mod DeWordle {
                 self.daily_player_stat.write(caller, new_daily_stat);
                 Option::Some(compare_word(self.get_daily_letters(), guessed_word.clone()))
             }
+        }
+
+        fn update_end_of_day(ref self: ContractState) {
+            if get_block_timestamp() >= self.end_of_day_timestamp.read() {
+                let new_end_of_day = get_next_midnight_timestamp();
+                self.end_of_day_timestamp.write(new_end_of_day);
+                self.emit(DayUpdated { new_end_of_day });
+            }
+        }
+
+        fn  get_end_of_day_timestamp(self : @ContractState )-> u64{
+            self.end_of_day_timestamp.read()
         }
     }
 
