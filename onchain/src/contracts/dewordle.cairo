@@ -3,7 +3,9 @@ pub mod DeWordle {
     use dewordle::constants::LetterState;
     use dewordle::interfaces::{IDeWordle, PlayerStat, DailyPlayerStat};
 
-    use dewordle::utils::{compare_word, is_correct_hashed_word, hash_word, hash_letter , get_next_midnight_timestamp};
+    use dewordle::utils::{
+        compare_word, is_correct_hashed_word, hash_word, hash_letter, get_next_midnight_timestamp
+    };
     use openzeppelin::access::accesscontrol::{AccessControlComponent};
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::introspection::src5::SRC5Component;
@@ -69,7 +71,7 @@ pub mod DeWordle {
         self.ownable.initializer(owner);
         self.accesscontrol.initializer();
         self.accesscontrol._grant_role(ADMIN_ROLE, owner);
-        let midnight_timestamp =get_next_midnight_timestamp();
+        let midnight_timestamp = get_next_midnight_timestamp();
         self.end_of_day_timestamp.write(midnight_timestamp);
     }
 
@@ -174,7 +176,7 @@ pub mod DeWordle {
             }
         }
 
-        fn  get_end_of_day_timestamp(self : @ContractState )-> u64{
+        fn get_end_of_day_timestamp(self: @ContractState) -> u64 {
             self.end_of_day_timestamp.read()
         }
     }

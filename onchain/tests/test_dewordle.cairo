@@ -2,7 +2,7 @@ use dewordle::interfaces::{IDeWordleDispatcher, IDeWordleDispatcherTrait};
 use dewordle::utils::{hash_word, hash_letter};
 use snforge_std::{
     declare, ContractClassTrait, DeclareResultTrait, start_cheat_caller_address,
-    stop_cheat_caller_address , cheat_block_timestamp ,CheatSpan,
+    stop_cheat_caller_address, cheat_block_timestamp, CheatSpan,
 };
 use starknet::ContractAddress;
 
@@ -383,7 +383,9 @@ fn test_update_end_of_day() {
     let initial_timestamp = dewordle.get_end_of_day_timestamp();
 
     // Fast forward time by one day
-    cheat_block_timestamp(contract_address, starknet::get_block_timestamp() + 86400, CheatSpan::TargetCalls(1));
+    cheat_block_timestamp(
+        contract_address, starknet::get_block_timestamp() + 86400, CheatSpan::TargetCalls(1)
+    );
     dewordle.update_end_of_day();
 
     // Verify update
