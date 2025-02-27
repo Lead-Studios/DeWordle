@@ -1,5 +1,5 @@
-import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa";
+import { FcGoogle } from 'react-icons/fc';
+import { FaApple } from 'react-icons/fa';
 
 export default function SignUpForm() {
   return (
@@ -83,7 +83,7 @@ export default function SignUpForm() {
         </button>
 
         <p className="text-center text-gray-600 mt-4 text-sm sm:text-base">
-          Already have an account?{" "}
+          Already have an account?{' '}
           <a href="/signin" className="text-indigo-600">
             Log In
           </a>
