@@ -1,18 +1,11 @@
 'use server';
 
+import { signIn } from 'next-auth/react';
+
 // Server-side redirect for authentication
+
 export async function handleGoogleSignIn() {
-  // This redirects the user to the NextAuth sign-in page with Google provider
-  const callbackUrl = '/';
-
-  // Redirect to the NextAuth sign-in URL
-  // This uses the HTTP redirect method from Next.js
-  const url = `/api/auth/signin/google?callbackUrl=${encodeURIComponent(
-    callbackUrl
-  )}`;
-
-  // Redirect
-  return { url };
+  await signIn('google', { callbackUrl: '/' });
 }
 
 export async function handleAppleSignIn() {
