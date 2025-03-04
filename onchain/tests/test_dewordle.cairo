@@ -401,28 +401,35 @@ fn test_submit_guess_with_time_reset() {
 
     start_cheat_caller_address(contract_address, OWNER());
 
+    // Define and set the daily word
     let daily_word = "tests";
     dewordle.set_daily_word(daily_word.clone());
 
+    // Play
     dewordle.play();
 
+    // Make a guess
     match dewordle.submit_guess("wrong") {
         Option::None => panic!("ERROR"),
         Option::Some(_) => (),
     }
 
+    // Check attempts remaining
     let daily_stat = dewordle.get_player_daily_stat(OWNER());
 
     assert(daily_stat.attempt_remaining == 5, 'Should have 5 attempts left');
 
+    // Fast forward time by more than a day
     let end_of_day_timestamp = dewordle.get_end_of_day_timestamp();
     cheat_block_timestamp(contract_address, end_of_day_timestamp + 1, CheatSpan::TargetCalls(1));
 
+    // Make another guess - should reset attempts due to time passing
     match dewordle.submit_guess("right") {
         Option::None => panic!("ERROR"),
         Option::Some(_) => (),
     }
 
+    // Check that attempts reset to 5 (6-1 for the new guess)
     let new_daily_stat = dewordle.get_player_daily_stat(OWNER());
     assert(new_daily_stat.attempt_remaining == 4, 'Should have 4 attempts again');
 
@@ -435,9 +442,11 @@ fn test_access_control_unauthorized_set_daily_word() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address };
 
+    // Try to set daily word as non-owner
     let non_owner = starknet::contract_address_const::<0x123>();
     start_cheat_caller_address(contract_address, non_owner);
 
+    // This should fail due to access control
     dewordle.set_daily_word("test");
 }
 
@@ -446,11 +455,14 @@ fn test_no_daily_word_set() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address };
 
+    // Play without setting a daily word
     dewordle.play();
 
+    // Get the daily player stat
     let player_address = starknet::get_caller_address();
     let daily_stat = dewordle.get_player_daily_stat(player_address);
 
+    // Verify player stats are initialized correctly
     assert(daily_stat.player == player_address, 'Incorrect player address');
     assert(daily_stat.attempt_remaining == 6, 'Incorrect attempt count');
 }
@@ -460,8 +472,10 @@ fn test_constructor_sets_timestamp() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address };
 
+    // Get the end of day timestamp
     let timestamp = dewordle.get_end_of_day_timestamp();
 
+    // Verify it's greater than the current timestamp
     assert(timestamp > starknet::get_block_timestamp(), 'Invalid end of day timestamp');
 }
 
@@ -470,10 +484,13 @@ fn test_update_end_of_day_no_change_before_day_ends() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address };
 
+    // Get initial timestamp
     let initial_timestamp = dewordle.get_end_of_day_timestamp();
 
+    // Call update before the day ends
     dewordle.update_end_of_day();
 
+    // Verify timestamp hasn't changed
     let updated_timestamp = dewordle.get_end_of_day_timestamp();
     assert(updated_timestamp == initial_timestamp, 'Timestamp should not change');
 }
@@ -483,9 +500,11 @@ fn test_get_player_daily_stat_new_player() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address };
 
+    // Get stats for a player that hasn't played yet
     let random_player = starknet::contract_address_const::<0x456>();
     let daily_stat = dewordle.get_player_daily_stat(random_player);
 
+    // Verify default values
     assert(daily_stat.player == random_player, 'Wrong player address');
     assert(daily_stat.attempt_remaining == 6, 'Should have 6 attempts');
     assert(!daily_stat.has_won, 'has_won should be false');
