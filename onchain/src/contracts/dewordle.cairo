@@ -156,22 +156,24 @@ pub mod DeWordle {
             assert(guessed_word.len() == self.word_len.read().into(), 'Length does not match');
             let caller = starknet::get_caller_address();
             let mut daily_stat = self.daily_player_stat.read(caller);
+            let current_timestamp = get_block_timestamp();
+
+            if current_timestamp >= self.end_of_day_timestamp.read() {
+                let new_end_of_day = get_next_midnight_timestamp();
+                self.end_of_day_timestamp.write(new_end_of_day);
+                self.emit(DayUpdated { new_end_of_day });
+
+                let new_daily_stat = DailyPlayerStat {
+                    player: caller,
+                    attempt_remaining: 6,
+                    has_won: false,
+                    won_at_attempt: 0,
+                    last_attempt_timestamp: current_timestamp,
+                };
+                self.daily_player_stat.write(caller, new_daily_stat);
+            }
             assert(!daily_stat.has_won, 'Player has already won');
             assert(daily_stat.attempt_remaining > 0, 'Player has exhausted attempts');
-
-            let current_timestamp = get_block_timestamp();
-            let last_attempt_timestamp = daily_stat.last_attempt_timestamp;
-
-            if last_attempt_timestamp < self.end_of_day_timestamp.read() - SECONDS_IN_A_DAY {
-                daily_stat =
-                    DailyPlayerStat {
-                        player: caller,
-                        attempt_remaining: 6,
-                        has_won: false,
-                        won_at_attempt: 0,
-                        last_attempt_timestamp: current_timestamp,
-                    };
-            }
 
             let hash_guessed_word = hash_word(guessed_word.clone());
             if is_correct_hashed_word(self.get_daily_word(), hash_guessed_word) {
@@ -183,7 +185,7 @@ pub mod DeWordle {
                     last_attempt_timestamp: current_timestamp,
                 };
                 self.daily_player_stat.write(caller, new_daily_stat);
-                return Option::None;
+                Option::None
             } else {
                 let new_daily_stat = DailyPlayerStat {
                     player: caller,
