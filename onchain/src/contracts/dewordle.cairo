@@ -112,9 +112,12 @@ pub mod DeWordle {
 
         fn get_daily_letters(self: @ContractState) -> Array<felt252> {
             let mut letter_arr = array![];
-            for i in 0..self.letters_in_word.len() {
-                letter_arr.append(self.letters_in_word.at(i).read());
-            };
+            for i in 0
+                ..self
+                    .letters_in_word
+                    .len() {
+                        letter_arr.append(self.letters_in_word.at(i).read());
+                    };
             letter_arr
         }
 

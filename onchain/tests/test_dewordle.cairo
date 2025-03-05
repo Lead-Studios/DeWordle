@@ -155,12 +155,13 @@ fn test_play_after_losing() {
     dewordle.play();
 
     // Simulate losing (6 incorrect guesses)
-    for _ in 0_u8..6_u8 {
-        match dewordle.submit_guess("wrong") {
-            Option::None => panic!("ERROR"),
-            Option::Some(_) => (),
-        }
-    };
+    for _ in 0_u8
+        ..6_u8 {
+            match dewordle.submit_guess("wrong") {
+                Option::None => panic!("ERROR"),
+                Option::Some(_) => (),
+            }
+        };
 
     // Play again
     dewordle.play();
@@ -257,12 +258,13 @@ fn test_submit_guess_panics_with_player_has_exhausted_attempts() {
     dewordle.play();
 
     // Simulate losing (6 incorrect guesses)
-    for _ in 0_u8..6_u8 {
-        match dewordle.submit_guess("wrong") {
-            Option::None => panic!("ERROR"),
-            Option::Some(_) => (),
-        }
-    };
+    for _ in 0_u8
+        ..6_u8 {
+            match dewordle.submit_guess("wrong") {
+                Option::None => panic!("ERROR"),
+                Option::Some(_) => (),
+            }
+        };
 
     match dewordle.submit_guess("wrong") {
         Option::None => panic!("ERROR"),
