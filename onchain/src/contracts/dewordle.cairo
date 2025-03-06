@@ -45,6 +45,7 @@ pub mod DeWordle {
         word_len: u8,
         player_stat: Map<ContractAddress, PlayerStat>,
         daily_player_stat: Map<ContractAddress, DailyPlayerStat>, // TODO: track day
+        active_players: Vec<ContractAddress>,
         end_of_day_timestamp: u64,
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
@@ -148,6 +149,7 @@ pub mod DeWordle {
             assert(daily_stat.attempt_remaining > 0, 'Player has exhausted attempts');
             let hash_guessed_word = hash_word(guessed_word.clone());
             if is_correct_hashed_word(self.get_daily_word(), hash_guessed_word) {
+                self.update_streak(caller);
                 let new_daily_stat = DailyPlayerStat {
                     player: caller,
                     attempt_remaining: daily_stat.attempt_remaining - 1,
@@ -155,6 +157,7 @@ pub mod DeWordle {
                     won_at_attempt: 6 - daily_stat.attempt_remaining,
                 };
                 self.daily_player_stat.write(caller, new_daily_stat);
+                self.track_active_player(caller);
                 Option::None
             } else {
                 let new_daily_stat = DailyPlayerStat {
@@ -164,6 +167,7 @@ pub mod DeWordle {
                     won_at_attempt: 0,
                 };
                 self.daily_player_stat.write(caller, new_daily_stat);
+                self.track_active_player(caller);
                 Option::Some(compare_word(self.get_daily_letters(), guessed_word.clone()))
             }
         }
@@ -173,11 +177,56 @@ pub mod DeWordle {
                 let new_end_of_day = get_next_midnight_timestamp();
                 self.end_of_day_timestamp.write(new_end_of_day);
                 self.emit(DayUpdated { new_end_of_day });
+
+                let mut i = 0;
+                while i < self.active_players.len() {
+                    let player = self.active_players.at(i).read();
+                    let mut stat = self.player_stat.read(player);
+
+                    // Reset streak if player did not play today
+                    if get_block_timestamp() - self.end_of_day_timestamp.read() > SECONDS_IN_A_DAY {
+                        stat.current_streak = 0;
+                        self.player_stat.write(player, stat);
+                    }
+
+                    i += 1;
+                };
             }
         }
 
         fn get_end_of_day_timestamp(self: @ContractState) -> u64 {
             self.end_of_day_timestamp.read()
+        }
+
+        fn track_active_player(ref self: ContractState, player: ContractAddress) {
+            let mut exists = false;
+            let mut i = 0;
+            while i < self.active_players.len() {
+                if self.active_players.at(i).read() == player {
+                    exists = true;
+                    break;
+                }
+                i += 1;
+            };
+            if !exists {
+                self.active_players.append().write(player);
+            }
+        }
+
+        fn update_streak(ref self: ContractState, player: ContractAddress) {
+            let mut player_stat = self.player_stat.read(player);
+
+            if get_block_timestamp() - self.end_of_day_timestamp.read() < SECONDS_IN_A_DAY {
+                player_stat.current_streak += 1;
+            } else {
+                player_stat.current_streak = 1; // Reset streak if a day was skipped
+            }
+
+            if player_stat.current_streak > player_stat.max_streak {
+                player_stat.max_streak = player_stat.current_streak;
+            }
+
+            self.player_stat.write(player, player_stat);
         }
     }
 
