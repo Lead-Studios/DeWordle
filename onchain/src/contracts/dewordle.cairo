@@ -41,10 +41,10 @@ pub mod DeWordle {
     #[storage]
     struct Storage {
         word_of_the_day: felt252,
-        letters_in_word: Vec<felt252>, //TODO: hash letters
+        letters_in_word: Vec<felt252>,
         word_len: u8,
         player_stat: Map<ContractAddress, PlayerStat>,
-        daily_player_stat: Map<ContractAddress, DailyPlayerStat>, // TODO: track day
+        daily_player_stat: Map<ContractAddress, DailyPlayerStat>,
         end_of_day_timestamp: u64,
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
@@ -82,6 +82,10 @@ pub mod DeWordle {
 
     #[abi(embed_v0)]
     impl DeWordleImpl of IDeWordle<ContractState> {
+        /// @notice Sets the word of the day
+        /// @param word: The ByteArray representing the new word to be set
+        /// @dev Only callable by an address with ADMIN_ROLE
+        /// @dev Hashes the word and stores it, along with each individual letter
         fn set_daily_word(ref self: ContractState, word: ByteArray) {
             self.accesscontrol.assert_only_role(ADMIN_ROLE);
             let word_len = word.len();
@@ -98,23 +102,10 @@ pub mod DeWordle {
             self.word_len.write(word_len.try_into().unwrap());
         }
 
-        fn get_daily_word(self: @ContractState) -> felt252 {
-            self.accesscontrol.assert_only_role(ADMIN_ROLE);
-            self.word_of_the_day.read()
-        }
-
-        fn get_daily_letters(self: @ContractState) -> Array<felt252> {
-            self.accesscontrol.assert_only_role(ADMIN_ROLE);
-            let mut letter_arr = array![];
-            for i in 0
-                ..self
-                    .letters_in_word
-                    .len() {
-                        letter_arr.append(self.letters_in_word.at(i).read());
-                    };
-            letter_arr
-        }
-
+        /// @notice Retrieves a player's daily statistics
+        /// @param player: The address of the player
+        /// @return DailyPlayerStat: The daily stats for the given player
+        /// @dev Returns default values if player hasn't played today (6 attempts, not won)
         fn get_player_daily_stat(self: @ContractState, player: ContractAddress) -> DailyPlayerStat {
             let daily_stat = self.daily_player_stat.read(player);
 
@@ -128,6 +119,7 @@ pub mod DeWordle {
             }
         }
 
+        // TODO: remove this
         fn play(ref self: ContractState) {
             let caller: ContractAddress = starknet::get_caller_address();
 
@@ -138,6 +130,12 @@ pub mod DeWordle {
             self.daily_player_stat.write(caller, new_daily_stat);
         }
 
+        /// @notice Submit a guess for the daily word
+        /// @param guessed_word: The ByteArray representing the player's guess
+        /// @return Option<Span<LetterState>>: None if the guess is correct, otherwise returns a
+        /// Span of LetterState indicating the correctness of each letter @dev Verifies the guess
+        /// length, validates player has attempts remaining and hasn't already won @dev Updates
+        /// player stats based on the outcome of the guess
         fn submit_guess(
             ref self: ContractState, guessed_word: ByteArray
         ) -> Option<Span<LetterState>> {
@@ -147,7 +145,7 @@ pub mod DeWordle {
             assert(!daily_stat.has_won, 'Player has already won');
             assert(daily_stat.attempt_remaining > 0, 'Player has exhausted attempts');
             let hash_guessed_word = hash_word(guessed_word.clone());
-            if is_correct_hashed_word(self.get_daily_word(), hash_guessed_word) {
+            if is_correct_hashed_word(self._get_daily_word(), hash_guessed_word) {
                 let new_daily_stat = DailyPlayerStat {
                     player: caller,
                     attempt_remaining: daily_stat.attempt_remaining - 1,
@@ -164,10 +162,17 @@ pub mod DeWordle {
                     won_at_attempt: 0,
                 };
                 self.daily_player_stat.write(caller, new_daily_stat);
-                Option::Some(compare_word(self.get_daily_letters(), guessed_word.clone()))
+                Option::Some(compare_word(self._get_daily_letters(), guessed_word.clone()))
             }
         }
 
+
+        // TODO refac: move to internal
+        // update tests accordingly
+
+        /// @notice Updates the end of day timestamp if the current day has ended
+        /// @dev Checks if current block timestamp is past the end of day and updates to next
+        /// midnight if needed @dev Emits a DayUpdated event when the timestamp is updated
         fn update_end_of_day(ref self: ContractState) {
             if get_block_timestamp() >= self.end_of_day_timestamp.read() {
                 let new_end_of_day = get_next_midnight_timestamp();
@@ -176,11 +181,33 @@ pub mod DeWordle {
             }
         }
 
+        /// @notice Gets the timestamp for when the current day ends
+        /// @return u64 The Unix timestamp for the end of the current day
         fn get_end_of_day_timestamp(self: @ContractState) -> u64 {
             self.end_of_day_timestamp.read()
         }
     }
 
     #[generate_trait]
-    pub impl InternalFunctions of InternalFunctionsTrait {}
+    pub impl InternalFunctions of InternalFunctionsTrait {
+        /// @notice Retrieves the hashed word of the day
+        /// @return felt252 The hashed word of the day
+        fn _get_daily_word(self: @ContractState) -> felt252 {
+            self.word_of_the_day.read()
+        }
+
+        /// @notice Gets the array of hashed letters for the daily word
+        /// @return Array<felt252> An array containing each hashed letter of the daily word
+        fn _get_daily_letters(self: @ContractState) -> Array<felt252> {
+            self.accesscontrol.assert_only_role(ADMIN_ROLE);
+            let mut letter_arr = array![];
+            for i in 0
+                ..self
+                    .letters_in_word
+                    .len() {
+                        letter_arr.append(self.letters_in_word.at(i).read());
+                    };
+            letter_arr
+        }
+    }
 }
