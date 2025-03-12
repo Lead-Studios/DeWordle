@@ -23,10 +23,11 @@ pub struct PlayerStat {
     pub max_streak: u64 //TODO: Impl streaking logic
 }
 
-#[derive(Drop, Serde, starknet::Store)]
+#[derive(Drop, Serde, starknet::Store, Debug)]
 pub struct DailyPlayerStat {
     pub player: ContractAddress,
     pub attempt_remaining: u8,
     pub has_won: bool,
     pub won_at_attempt: u8,
+    pub last_attempt_timestamp: u64,
 }
