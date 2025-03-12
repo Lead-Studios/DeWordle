@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { Formik, Form, Field } from 'formik';
-import { signInSchema } from '../utils/authValidationSchema';
+import { signInSchema } from '@/utils/authValidationSchema';
 
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -32,7 +32,7 @@ const SignInForm = () => {
   };
 
   return (
-    <div className="w-[498px] bg-[#ffffff] max-w-md mx-auto">
+    <div className="w-[498px] bg-[#ffffff] max-w-md mx-auto ">
       <h1 className="text-[48px] md:text-[48px] text-[#29296E] font-[600] font-roboto text-center mb-10 text-3xl sm:text-4xl">
         Sign In
       </h1>
@@ -136,7 +136,7 @@ const SignInForm = () => {
               <span className="relative bg-white px-4 text-sm">or</span>
             </div>
 
-            <div className="text-center text-base sm:text-lg md:text-[20px] mt-6">
+            <div className="text-center text-base sm:text-lg md:text-[20px] mt-6 ">
               New to Dewordle?
               <Link
                 href="/signup"
@@ -148,7 +148,7 @@ const SignInForm = () => {
           </Form>
         )}
       </Formik>
-      <div className="space-y-4">
+      <div className="space-y-4 flex mt-[1em]">
         <button
           type="button"
           className="w-full text-[18px] font-[700] h-[59px] flex items-center justify-center gap-2 border border-none rounded-[32px] py-2 px-4 bg-[#F2F2F4] hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"

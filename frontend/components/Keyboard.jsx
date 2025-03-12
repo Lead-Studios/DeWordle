@@ -1,7 +1,7 @@
 "use client";
 import React, { useContext, useEffect, useCallback, useState } from "react";
 import { Delete } from "lucide-react";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "@/context/AppContext";
 import gsap from "gsap";
 
 const Keyboard = () => {
@@ -414,7 +414,7 @@ const Keyboard = () => {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto mt-8 mb-8 keyboard">
+    <div className="w-full max-w-xl mx-auto mt-8 mb-4 keyboard">
       <div className="space-y-3">
         {" "}
         {/* Increased space between rows */}

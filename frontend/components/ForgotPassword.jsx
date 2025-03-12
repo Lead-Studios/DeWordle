@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Formik, Form, Field } from 'formik';
-import { ForgotPasswordSchema } from '../utils/schema/forgotPasswordSchema';
+import { ForgotPasswordSchema } from '@/utils/schema/forgotPasswordSchema';
 
 
 function ForgotPassword() {
@@ -18,14 +18,14 @@ function ForgotPassword() {
     };
 
     return (
-        <div className="bg-white min-h-screen flex flex-col">
+        <div className="mt-10 flex flex-col">
             <main className="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
                 <div className="w-full max-w-max sm:max-w-md md:max-w-fit">
                     <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[48px] font-semibold text-center text-[#29296E] mb-4 md:mb-6">
                         Forgot Password?
                     </h1>
 
-                    <p className="text-base sm:text-lg md:text-xl lg:text-[24px] text-center text-gray-600 mt-4 sm:mt-6 md:mt-8 mb-6 sm:mb-8 md:mb-12">
+                    <p className="text-base sm:text-sm md:text-xl lg:text-[18px] text-center text-gray-400 font-light mt-4 sm:mt-6 md:mt-8 mb-2 sm:mb-8 md:mb-12">
                         Enter the email address associated with your account<br className="hidden sm:block" />
                         so we can send a link to reset your password
                     </p>

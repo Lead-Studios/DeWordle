@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
-import share from "../assets/share.png";
-import avatar from "../assets/avatar.png";
+import share from "@/assets/share.png";
+import avatar from "@/assets/avatar.png";
 
 const LeaderBoardModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;

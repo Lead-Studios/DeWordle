@@ -1,5 +1,5 @@
-import Keyboard from "../../../components/Keyboard";
-import WordGrid from "../../../components/WordGrid.jsx";
+import Keyboard from "@/components/Keyboard";
+import WordGrid from "@/components/WordGrid.jsx";
 
 export default function page() {
   return (

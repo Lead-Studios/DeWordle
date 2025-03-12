@@ -19,9 +19,7 @@ const LandingPage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   return (
-    <div className="w-full h-full relative px-4 pb-2  sm:px-10 xl:px-20">
-
-
+    <div className="w-full h-full relative px-4 mt-24 sm:px-10 xl:px-20">
       <header
         className={`fixed inset-x-0 top-0 z-50 py-4 lg:py-5 sm:px-10 xl:px-20 bg-white transition-shadow ${
           hasShadow ? "shadow-[0_1px_4px_rgba(0,0,0,0.05)]" : "shadow-none"

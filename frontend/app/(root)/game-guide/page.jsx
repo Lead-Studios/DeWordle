@@ -1,11 +1,10 @@
-import DailyChallenge from "@/components/DailyChallenge";
-
 import React from "react";
+import DewordleTutorial from "@/components/GameGuide";
 
 const page = () => {
   return (
     <div>
-      <DailyChallenge />
+      <DewordleTutorial />
     </div>
   );
 };

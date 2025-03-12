@@ -24,12 +24,12 @@ export default function SubAdminSignInForm() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto px-4">
+    <div className="w-full max-w-md mx-auto px-4 py-12">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-[#383874] mb-2">
+        <h1 className="text-2xl md:text-4xl font-bold text-[#383874] mb-2">
           Sub Admin Sign In
         </h1>
-        <p className="text-gray-600">Enter your details to Log In</p>
+        <p className="text-gray-600 text-sm md:text-base">Enter your details to Log In</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">

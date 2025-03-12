@@ -1,13 +1,12 @@
-import EditProfile from '../../../components/EditProfile'
-import React from 'react'
-// import EditProfile from '../../components/EditProfile'
+import React from "react";
+import EditProfile from "@/components/EditProfile";
 
 const page = () => {
   return (
     <div>
-        <EditProfile />
+      <EditProfile />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;

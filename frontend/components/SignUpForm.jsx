@@ -8,7 +8,7 @@ import { Formik, Form, Field } from 'formik';
 import { FcGoogle } from 'react-icons/fc';
 import { FaApple } from 'react-icons/fa';
 import * as Yup from 'yup';
-import { signUpSchema } from '../utils/authValidationSchema';
+import { signUpSchema } from '@/utils/authValidationSchema';
 
 const SignUpForm = () => {
   const router = useRouter();

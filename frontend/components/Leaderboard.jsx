@@ -1,6 +1,6 @@
 import Image from "next/image";
-import profile1 from "../assets/profile1.png";
-import profile2 from "../assets/profile2.png";
+import profile1 from "@/assets/profile1.png";
+import profile2 from "@/assets/profile2.png";
 
 const Leaderboard = () => {
   const date = "17 Feb 2025 ";

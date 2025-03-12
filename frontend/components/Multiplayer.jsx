@@ -177,7 +177,7 @@ export default function DewordleMultiplayer() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center p-4">
+    <div className="min-h-80 bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
         <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
           Dewordle Multiplayer

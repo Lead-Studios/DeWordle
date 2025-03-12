@@ -1,3 +1,12 @@
-import Achievements from "../../../components/Achievements"
+import React from "react";
+import Achievements from "@/components/Achievements";
 
-<Achievements/>
+const page = () => {
+  return (
+    <div>
+      <Achievements />
+    </div>
+  );
+};
+
+export default page;

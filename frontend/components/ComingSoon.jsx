@@ -18,7 +18,7 @@ export default function ComingSoon() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white px-4 py-12">
+    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-12">
       <main className="max-w-3xl mx-auto text-center">
         {/* Colorful gradient heading */}
         <h1 className="text-6xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-green-400 via-blue-500 to-pink-500 text-transparent bg-clip-text">
@@ -26,7 +26,7 @@ export default function ComingSoon() {
         </h1>
 
         {/* Subtitle */}
-        <p className="text-lg md:text-xl text-gray-300 mb-12 max-w-lg mx-auto">
+        <p className="text-lg md:text-xl text-gray-800 mb-12 max-w-lg mx-auto">
           From automation of people processes to creating an engaged and driven culture.
         </p>
 

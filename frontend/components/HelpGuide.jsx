@@ -1,28 +1,28 @@
 "use client";
 
 import React from "react";
-import { Button } from "../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "../components/ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "../components/ui/tabs";
+} from "@/components/ui/tabs";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "../components/ui/accordion";
+} from "@/components/ui/accordion";
 import { BookOpen, Settings, Gamepad2 } from "lucide-react";
 import Link from "next/link";
-import { helpContent } from "../utils/helpContent";
+import { helpContent } from "@/utils/helpContent";
 
 // Component for rendering individual letter tiles
 function LetterTile({ letter, state = "absent" }) {

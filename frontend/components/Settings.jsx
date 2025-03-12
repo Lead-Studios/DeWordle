@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import { Switch } from "@headlessui/react";
 import Copywrite from "./Copywrite";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "@/context/ThemeContext";
 
 export const Setting = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
