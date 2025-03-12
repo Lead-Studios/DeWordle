@@ -109,22 +109,6 @@ pub mod DeWordle {
             self.word_len.write(word_len.try_into().unwrap());
         }
 
-        fn get_daily_word(self: @ContractState) -> felt252 {
-            self.accesscontrol.assert_only_role(ADMIN_ROLE);
-            self.word_of_the_day.read()
-        }
-
-        fn get_daily_letters(self: @ContractState) -> Array<felt252> {
-            let mut letter_arr = array![];
-            for i in 0
-                ..self
-                    .letters_in_word
-                    .len() {
-                        letter_arr.append(self.letters_in_word.at(i).read());
-                    };
-            letter_arr
-        }
-
         /// @notice Retrieves a player's daily statistics
         /// @param player: The address of the player
         /// @return DailyPlayerStat: The daily stats for the given player
@@ -173,7 +157,6 @@ pub mod DeWordle {
         ) -> Option<Span<LetterState>> {
             assert(guessed_word.len() == self.word_len.read().into(), 'Length does not match');
             let caller = starknet::get_caller_address();
-            let mut daily_stat = self.daily_player_stat.read(caller);
             let current_timestamp = get_block_timestamp();
 
             if current_timestamp >= self.end_of_day_timestamp.read() {
@@ -190,6 +173,7 @@ pub mod DeWordle {
                 };
                 self.daily_player_stat.write(caller, new_daily_stat);
             }
+            let mut daily_stat = self.daily_player_stat.read(caller);
             assert(!daily_stat.has_won, 'Player has already won');
             assert(daily_stat.attempt_remaining > 0, 'Player has exhausted attempts');
 
@@ -252,12 +236,9 @@ pub mod DeWordle {
         fn _get_daily_letters(self: @ContractState) -> Array<felt252> {
             self.accesscontrol.assert_only_role(ADMIN_ROLE);
             let mut letter_arr = array![];
-            for i in 0
-                ..self
-                    .letters_in_word
-                    .len() {
-                        letter_arr.append(self.letters_in_word.at(i).read());
-                    };
+            for i in 0..self.letters_in_word.len() {
+                letter_arr.append(self.letters_in_word.at(i).read());
+            };
             letter_arr
         }
     }

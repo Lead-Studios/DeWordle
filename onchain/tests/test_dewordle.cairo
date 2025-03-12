@@ -1,5 +1,5 @@
 use dewordle::interfaces::{IDeWordleDispatcher, IDeWordleDispatcherTrait};
-use dewordle::utils::{hash_letter, hash_word};
+// use dewordle::utils::{hash_letter, hash_word};
 use snforge_std::{
     CheatSpan, ContractClassTrait, DeclareResultTrait, cheat_block_timestamp, declare,
     start_cheat_caller_address, stop_cheat_caller_address,
@@ -156,13 +156,12 @@ fn test_play_after_losing() {
     dewordle.play();
 
     // Simulate losing (6 incorrect guesses)
-    for _ in 0_u8
-        ..6_u8 {
-            match dewordle.submit_guess("wrong") {
-                Option::None => panic!("ERROR"),
-                Option::Some(_) => (),
-            }
-        };
+    for _ in 0_u8..6_u8 {
+        match dewordle.submit_guess("wrong") {
+            Option::None => panic!("ERROR"),
+            Option::Some(_) => (),
+        }
+    };
 
     // Play again
     dewordle.play();
@@ -259,13 +258,12 @@ fn test_submit_guess_panics_with_player_has_exhausted_attempts() {
     dewordle.play();
 
     // Simulate losing (6 incorrect guesses)
-    for _ in 0_u8
-        ..6_u8 {
-            match dewordle.submit_guess("wrong") {
-                Option::None => panic!("ERROR"),
-                Option::Some(_) => (),
-            }
-        };
+    for _ in 0_u8..6_u8 {
+        match dewordle.submit_guess("wrong") {
+            Option::None => panic!("ERROR"),
+            Option::Some(_) => (),
+        }
+    };
 
     match dewordle.submit_guess("wrong") {
         Option::None => panic!("ERROR"),
@@ -434,7 +432,7 @@ fn test_submit_guess_with_time_reset() {
 
     // Check that attempts reset to 5 (6-1 for the new guess)
     let new_daily_stat = dewordle.get_player_daily_stat(OWNER());
-    assert(new_daily_stat.attempt_remaining == 4, 'Should have 4 attempts again');
+    assert(new_daily_stat.attempt_remaining == 5, 'Should have 5 attempts again');
 
     stop_cheat_caller_address(contract_address);
 }
