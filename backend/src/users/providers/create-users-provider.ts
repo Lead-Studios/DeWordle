@@ -59,7 +59,7 @@ export class CreateUsersProvider {
     const newUser: DeepPartial<User> = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
-      result: [], // Ensure it's an array
+      results: [], // Ensure it's an array
       leaderboard: [],
     });
 

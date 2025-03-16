@@ -4,17 +4,7 @@ import { Transform } from 'class-transformer';
 
 class EnvironmentVariables {
   @IsString()
-  DB_HOST: string;
-
-  @Transform(({ value }) => Number(value))
-  @IsNumber()
-  DB_PORT: number;
-
-  @IsString()
-  DB_USERNAME: string;
-
-  @IsString()
-  DB_PASSWORD: string;
+  DATABASE_URL: string;
 
   @IsString()
   JWT_SECRET: string;
@@ -24,7 +14,6 @@ class EnvironmentVariables {
 
   @IsString()
   CONTRACT_ADDRESS: string;
-  
 }
 
 export function validate(config: Record<string, unknown>) {

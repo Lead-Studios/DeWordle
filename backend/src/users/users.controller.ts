@@ -32,7 +32,7 @@ import { JwtAuthGuard } from 'security/guards/jwt-auth.guard';
 @ApiTags('Users')
 @ApiBearerAuth() // Enable Bearer Token authentication for all endpoints
 @Controller('/api/v1/users')
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -56,8 +56,8 @@ export class UsersController {
     description: 'Forbidden',
   })
   @ApiBody({ type: CreateUserDto })
-  @UseGuards(RolesGuard)
-  @RoleDecorator(UserRole.User, UserRole.Admin)
+  // @UseGuards(RolesGuard)
+  // @RoleDecorator(UserRole.User, UserRole.Admin)
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }

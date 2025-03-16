@@ -5,11 +5,15 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Token } from '../../auth/entities/token.entity';
+import { Wallet } from 'src/economy/entities/wallet.entity';
 
 @Entity()
 export class User {
@@ -26,21 +30,31 @@ export class User {
   password: string;
 
   @Column({ default: false })
-    isVerified: boolean;
-  
+  isVerified: boolean;
+
   @OneToMany(() => Token, (token) => token.user)
   tokens: Token[];
 
-  @OneToMany(() => Result, (result) => result.user, {
-    cascade: true,
-  })
-  result: Result[];
+  // @OneToOne(() => Wallet, { cascade: true, eager: true })
+  // @JoinColumn({ name: 'wallet_id' })
+  wallets: Wallet;
+
+  @Column({ name: 'wallet_id', nullable: true })
+  walletId: string;
+
+  // @OneToMany(() => Result, (result) => result.user, {
+  //   cascade: true,
+  // })
+  // result: Result[];
 
   @OneToMany(() => Leaderboard, (leaderboard) => leaderboard.user, {
     cascade: true,
     eager: true,
   })
   leaderboard: Leaderboard[];
+
+  @Column({ nullable: true })
+  rank: string;
 
   @OneToMany(() => Leaderboard, (leaderboard) => leaderboard.user, {
     cascade: true,
@@ -55,7 +69,7 @@ export class User {
   results: Result[];
 
   @Column('varchar', { length: 225, nullable: true })
-  googleId?: string
+  googleId?: string;
 
   @Column({ nullable: true })
   lastActivityAt: Date;

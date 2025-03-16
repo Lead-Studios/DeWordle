@@ -17,22 +17,22 @@ export class Result {
   @ManyToOne(() => User, (user) => user.results)
   userId: User;
 
-  @ManyToOne(() => User, (user) => user.result, {
+  @ManyToOne(() => User, (user) => user.results, {
     onDelete: 'CASCADE',
     eager: true,
   })
   user: User;
 
-  @Column('varchar', { nullable: false })
+  @Column('varchar', { nullable: true })
   word: string;
 
-  @Column('varchar')
+  @Column('varchar', { nullable: true })
   feedback: string | [];
 
-  @Column('integer')
+  @Column('integer', { nullable: true })
   attempts: number;
 
-  @Column({ type: 'enum', enum: Status })
+  @Column({ type: 'enum', enum: Status, default: Status.LOST })
   status: Status;
 
   @CreateDateColumn()

@@ -1,0 +1,263 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int           @id @default(autoincrement())
+  userName       String        @unique
+  email          String        @unique
+  password       String
+  isVerified     Boolean       @default(false)
+  walletId       String?
+  rank           String?
+  googleId       String?
+  lastActivityAt DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
+  results        Result[]      @relation("UserResults")
+  leaderboard    Leaderboard[]
+  tokens         Token[]
+}
+
+model Admin {
+  id                      Int       @id @default(autoincrement())
+  username                String
+  email                   String
+  password                String
+  role                    String    @default("admin")
+  emailVerified           Boolean   @default(false)
+  refreshToken            String?
+  resetToken              String?
+  resetTokenExpiry        DateTime?
+  verificationToken       String?
+  verificationTokenExpiry DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  @@map("admin")
+}
+
+model SubAdmin {
+  id                Int       @id @default(autoincrement())
+  name              String
+  email             String    @unique
+  password          String
+  role              String    @default("sub-admin")
+  resetToken        String?
+  resetTokenExpires DateTime?
+
+  @@map("sub_admin")
+}
+
+model Token {
+  id        Int       @id @default(autoincrement())
+  token     String
+  type      TokenType
+  userId    Int
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  users     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tokens")
+}
+
+model Wallet {
+  id           String        @id @default(uuid())
+  points       Int           @default(0)
+  tokens       Int           @default(0)
+  userId       Int
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  transactions Transaction[]
+
+  @@map("wallets")
+}
+
+model Transaction {
+  id                String          @id @default(uuid())
+  type              TransactionType
+  currencyType      CurrencyType
+  amount            Int
+  description       String?
+  referenceId       String?
+  walletId          String
+  recipientWalletId String?
+  createdAt         DateTime        @default(now())
+  wallet            Wallet          @relation(fields: [walletId], references: [id])
+
+  @@map("transactions")
+}
+
+model Leaderboard {
+  id            Int   @id @default(autoincrement())
+  totalWins     Int   @default(0)
+  totalAttempts Int   @default(0)
+  averageScore  Float @default(0)
+  userId        Int
+  user          User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("leaderboard")
+}
+
+model Achievement {
+  id          String   @id
+  name        String
+  description String
+  icon        String?
+  threshold   Int
+  type        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("contribution_leaderboard_achievements")
+}
+
+model ContributionType {
+  id            String   @id @default(uuid())
+  name          String   @unique
+  defaultPoints Int      @default(1)
+  description   String?
+  icon          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("contribution_leaderboard_contribution_types")
+}
+
+model Contribution {
+  id                 String   @id @default(uuid())
+  userId             String
+  contributionTypeId String
+  points             Int      @default(1)
+  metadata           Json     @default("{}")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([userId])
+  @@index([contributionTypeId])
+  @@index([createdAt])
+  @@map("contribution_leaderboard_contributions")
+}
+
+model UserAchievement {
+  id            String   @id @default(uuid())
+  userId        String
+  achievementId String
+  awardedAt     DateTime
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([achievementId])
+  @@index([awardedAt])
+  @@map("contribution_leaderboard_user_achievements")
+}
+
+model UserContribution {
+  id                   String    @id @default(uuid())
+  userId               String    @unique
+  avatarUrl            String
+  username             String
+  totalPoints          Int       @default(0)
+  submissionCount      Int       @default(0)
+  editCount            Int       @default(0)
+  approvalCount        Int       @default(0)
+  commentCount         Int       @default(0)
+  lastContributionDate DateTime?
+  achievements         String
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([totalPoints])
+  @@index([lastContributionDate])
+  @@map("contribution_leaderboard_user_contributions")
+}
+
+model Result {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  word          String
+  feedback      Json
+  attempts      Int
+  status        Status
+  gameDate      DateTime @default(now())
+  timesPlayed   Int      @default(0)
+  currentStreak Int      @default(0)
+  maxStreak     Int      @default(0)
+  wins          Int      @default(0)
+  winPercentage Float    @default(0)
+  user          User     @relation("UserResults", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model StatusResult {
+  id            Int    @id @default(autoincrement())
+  userId        String
+  timesPlayed   Int    @default(0)
+  currentStreak Int    @default(0)
+  maxStreak     Int    @default(0)
+  winPercentage Float  @default(0)
+
+  @@map("status_result")
+}
+
+model RetentionMetric {
+  id             Int      @id @default(autoincrement())
+  date           DateTime
+  period         String
+  totalUsers     Int
+  activeUsers    Int
+  retentionRate  Float
+  churnRate      Float
+  newUsers       Int
+  returningUsers Int
+  cohortData     Json?
+  createdAt      DateTime @default(now())
+
+  @@index([date])
+  @@index([period])
+  @@map("retention_metric")
+}
+
+model Reward {
+  id            Int      @id @default(autoincrement())
+  playerAddress String
+  amount        Float
+  claimed       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@map("reward")
+}
+
+enum TransactionType {
+  POINTS_EARNED
+  POINTS_SPENT
+  POINTS_TRANSFERRED
+  TOKENS_PURCHASED
+  TOKENS_SPENT
+  TOKENS_TRANSFERRED
+}
+
+enum CurrencyType {
+  POINTS
+  TOKENS
+}
+
+enum Status {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum TokenType {
+  ACCESS
+  REFRESH
+}
