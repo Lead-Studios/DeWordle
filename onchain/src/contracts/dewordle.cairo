@@ -87,20 +87,33 @@ pub mod DeWordle {
         /// @dev Only callable by an address with ADMIN_ROLE
         /// @dev Hashes the word and stores it, along with each individual letter
         fn set_daily_word(ref self: ContractState, word: ByteArray) {
-            self.accesscontrol.assert_only_role(ADMIN_ROLE);
-            let word_len = word.len();
-            let hash_word = hash_word(word.clone());
-            self.word_of_the_day.write(hash_word);
-            let mut i = 0;
+    self.accesscontrol.assert_only_role(ADMIN_ROLE);
 
-            while (i < word_len) {
-                let hashed_letter = hash_letter(word[i].into());
-                self.letters_in_word.append().write(hashed_letter);
-                i += 1;
-            };
+    // Ensure the word is set only once per day
+    assert(
+        get_block_timestamp() >= self.end_of_day_timestamp.read(),
+        'Cannot set word before the current day ends'
+    );
 
-            self.word_len.write(word_len.try_into().unwrap());
-        }
+    let word_len = word.len();
+    let hash_word = hash_word(word.clone());
+    self.word_of_the_day.write(hash_word);
+    let mut i = 0;
+
+    while (i < word_len) {
+        let hashed_letter = hash_letter(word[i].into());
+        self.letters_in_word.append().write(hashed_letter);
+        i += 1;
+    };
+
+    self.word_len.write(word_len.try_into().unwrap());
+
+    // Update the end of day timestamp to the next midnight
+    let new_end_of_day = get_next_midnight_timestamp();
+    self.end_of_day_timestamp.write(new_end_of_day);
+    self.emit(DayUpdated { new_end_of_day });
+}
+
 
         /// @notice Retrieves a player's daily statistics
         /// @param player: The address of the player
