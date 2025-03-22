@@ -7,6 +7,10 @@ import { ThemeProvider } from '../context/ThemeContext';
 import { Manrope } from 'next/font/google';
 import { Roboto } from 'next/font/google';
 import { QueryProvider, SessionProvider } from '@/app/providers';
+import { useRouter } from 'next/navigation';
+import LandingNavbar from '@/components/LandingNavbar';
+import DewordleNavbar from '@/components/DewordleNavbar';
+import Footer from '@/components/footer';
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -29,6 +33,9 @@ const geistMono = Geist_Mono({
 });
 
 export default function RootLayout({ children }) {
+  const router = useRouter();
+  const isLandingPage = router.pathname === '/';
+
   return (
     <ThemeProvider>
       <html
@@ -41,7 +48,9 @@ export default function RootLayout({ children }) {
         </head>
         <body className="min-h-screen flex flex-col justify-between h-auto w-full antialiased">
           <QueryProvider>
+            {isLandingPage ? <LandingNavbar /> : <DewordleNavbar />}
             <main className="flex-grow ">{children}</main>
+            <Footer />
           </QueryProvider>
         </body>
       </html>

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import NavbarLandingPage from "./NavbarLandingPage";
+import DewordleNavbar from "./DewordleNavbar";
 
 const navigation = [{ name: "How to play", href: "#" }];
 
@@ -25,7 +25,7 @@ const LandingPage = () => {
           hasShadow ? "shadow-[0_1px_4px_rgba(0,0,0,0.05)]" : "shadow-none"
         }`}
       >
-        <NavbarLandingPage />
+        <DewordleNavbar />
       </header>
 
       <div className="w-full h-full max-w-7xl mx-auto">
