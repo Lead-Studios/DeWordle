@@ -19,6 +19,114 @@ fn deploy_contract() -> ContractAddress {
     contract_address
 }
 
+
+#[test]
+fn test_set_daily_word_success() {
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address };
+
+    // Set the caller address to the owner
+    start_cheat_caller_address(OWNER());
+
+    // Set the block timestamp to a specific time, here  January 1 2023 00:00:00 UTC
+    cheat_block_timestamp(1672531200); 
+
+    // Define and set the daily word
+    let daily_word = ByteArray::from("hello");
+    dewordle.set_daily_word(daily_word.clone());
+
+    // Verify the word and its length are set correctly
+    assert_eq!(
+        dewordle.get_daily_word(),
+        hash_word(daily_word.clone()),
+        "Daily word not stored correctly"
+    );
+
+    // Verify the end_of_day_timestamp is updated to the next midnight
+    let next_midnight = get_next_midnight_timestamp();
+    assert_eq!(
+        dewordle.get_end_of_day_timestamp(),
+        next_midnight,
+        "end_of_day_timestamp not updated correctly"
+    );
+
+    // Stopping cheating the caller address
+    stop_cheat_caller_address(OWNER());
+}
+
+#[test]
+fn test_set_daily_word_twice_in_same_day_fails() {
+   
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address };
+
+    
+    start_cheat_caller_address(OWNER());
+
+    // Set the block timestamp to Jan 1 2023 00:00:00 UTC
+    cheat_block_timestamp(1672531200); 
+    // Define and set the daily word
+    let daily_word = ByteArray::from("hello");
+    dewordle.set_daily_word(daily_word.clone());
+
+    // Attempt to set the daily word again within the same day
+    cheat_block_timestamp(1672531200 + 3600); //  Jan 1 2023 01:00:00 UTC
+    let result = std::panic::catch_unwind(|| {
+        dewordle.set_daily_word(ByteArray::from("world"));
+    });
+
+    // Verify the function panics  when called more than once per day
+    assert!(
+        result.is_err(),
+        "Expected set_daily_word to fail when called more than once per day"
+    );
+
+    // Stop cheating the caller address
+    stop_cheat_caller_address(OWNER());
+}
+
+#[test]
+fn test_set_daily_word_after_midnight_succeeds() {
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address };
+
+    // Set the caller address to the owner
+    start_cheat_caller_address(OWNER());
+
+    // Set the block timestamp to jan 1 2023
+    cheat_block_timestamp(1672531200);
+
+    // Define and set the daily word
+    let daily_word = ByteArray::from("hello");
+    dewordle.set_daily_word(daily_word.clone());
+
+    // Advance the block timestamp to the next day (after midnight)
+    cheat_block_timestamp(1672617600); 
+
+    // Define and set a new daily word
+    let new_daily_word = ByteArray::from("world");
+    dewordle.set_daily_word(new_daily_word.clone());
+
+    // Verify the new word and its length are set correctly
+    assert_eq!(
+        dewordle.get_daily_word(),
+        hash_word(new_daily_word.clone()),
+        "New daily word not stored correctly"
+    );
+
+    // Verify the end_of_day_timestamp is updated to the next midnight
+    let next_midnight = get_next_midnight_timestamp();
+    assert_eq!(
+        dewordle.get_end_of_day_timestamp(),
+        next_midnight,
+        "end_of_day_timestamp not updated correctly"
+    );
+
+    // Stop cheating the caller address
+    stop_cheat_caller_address(OWNER());
+}
+
+
 // #[test]
 // fn test_set_daily_word() {
 //     // Deploy the contract
