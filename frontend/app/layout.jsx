@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Geist, Azeret_Mono as Geist_Mono } from 'next/font/google';
 import './globals.css';
@@ -13,23 +13,23 @@ import DewordleNavbar from '@/components/DewordleNavbar';
 import Footer from '@/components/footer';
 
 const roboto = Roboto({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-roboto',
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-roboto",
 });
 const manrope = Manrope({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-manrope',
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-manrope",
 });
 const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export default function RootLayout({ children }) {

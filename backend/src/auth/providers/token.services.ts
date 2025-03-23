@@ -13,7 +13,12 @@ export class TokenService {
   ) {}
 
   // Save token when a user logs in
-  async saveToken(user: User, token: string, type: TokenType, expiresAt: Date): Promise<Token> {
+  async saveToken(
+    user: User,
+    token: string,
+    type: TokenType,
+    expiresAt: Date,
+  ): Promise<Token> {
     const newToken = this.tokenRepository.create({
       user,
       token,

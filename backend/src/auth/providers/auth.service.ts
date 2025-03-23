@@ -47,7 +47,7 @@ export class AuthService {
 
   public async SignIn(signInDto: SignInDto) {
     // try {
-      return await this.signInProvider.SignIn(signInDto);
+    return await this.signInProvider.SignIn(signInDto);
     // } catch (error) {
     //   throw new Error('Authentication failed'); // The filter will handle this
     // }

@@ -65,7 +65,12 @@ export class SignInProvider {
     }
 
     const tokens = await this.generateTokensProvider.generateTokens(user);
-    await this.tokenService.saveToken(user, tokens.refresh_token, TokenType.REFRESH, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+    await this.tokenService.saveToken(
+      user,
+      tokens.refresh_token,
+      TokenType.REFRESH,
+      new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    );
     return [tokens, user];
   }
 }

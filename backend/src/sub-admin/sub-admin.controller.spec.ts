@@ -8,7 +8,7 @@ describe('SubAdminController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SubAdminController],
-      providers: [SubAdminService], 
+      providers: [SubAdminService],
     }).compile();
 
     controller = module.get<SubAdminController>(SubAdminController);
