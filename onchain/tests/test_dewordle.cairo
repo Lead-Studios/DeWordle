@@ -55,6 +55,7 @@ fn test_set_daily_word_success() {
 }
 
 #[test]
+#[should_panic(expected = "set_daily_word to fail when called more than once per day")]
 fn test_set_daily_word_twice_in_same_day_fails() {
    
     let contract_address = deploy_contract();
