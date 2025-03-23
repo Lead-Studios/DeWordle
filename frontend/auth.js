@@ -7,6 +7,6 @@ export const authOptions = {
 
 const authHandler = NextAuth(authOptions);
 
-export const { GET, POST } = authHandler;
+export const { GET, POST, signIn } = authHandler;
 
 export { authHandler as handlers };

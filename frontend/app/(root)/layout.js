@@ -9,7 +9,7 @@ const Layout = ({ children }) => {
   return (
     <main>
       <AppProvider>
-        {!hideNavbar && <Navbar />}
+        {/* {!hideNavbar && <Navbar />} */}
         {children}
       </AppProvider>
     </main>

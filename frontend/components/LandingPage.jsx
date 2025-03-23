@@ -20,13 +20,13 @@ const LandingPage = () => {
   }, []);
   return (
     <div className="w-full h-full relative px-4 mt-24 sm:px-10 xl:px-20">
-      <header
+      {/* <header
         className={`fixed inset-x-0 top-0 z-50 py-4 lg:py-5 sm:px-10 xl:px-20 bg-white transition-shadow ${
           hasShadow ? "shadow-[0_1px_4px_rgba(0,0,0,0.05)]" : "shadow-none"
         }`}
       >
         <DewordleNavbar />
-      </header>
+      </header> */}
 
       <div className="w-full h-full max-w-7xl mx-auto">
         <div className="mx-auto justify-between lg:flex gap-10 xl:gap-24 mt-8 ">

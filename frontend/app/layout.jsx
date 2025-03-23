@@ -7,7 +7,7 @@ import { ThemeProvider } from '../context/ThemeContext';
 import { Manrope } from 'next/font/google';
 import { Roboto } from 'next/font/google';
 import { QueryProvider, SessionProvider } from '@/app/providers';
-import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import LandingNavbar from '@/components/LandingNavbar';
 import DewordleNavbar from '@/components/DewordleNavbar';
 import Footer from '@/components/footer';
@@ -33,8 +33,8 @@ const geistMono = Geist_Mono({
 });
 
 export default function RootLayout({ children }) {
-  const router = useRouter();
-  const isLandingPage = router.pathname === '/';
+  const pathname = usePathname();
+  const isLandingPage = pathname === '/';
 
   return (
     <ThemeProvider>
