@@ -1,17 +1,17 @@
 #[starknet::contract]
 pub mod DeWordle {
     use dewordle::constants::LetterState;
-    use dewordle::interfaces::{IDeWordle, PlayerStat, DailyPlayerStat};
+    use dewordle::interfaces::{DailyPlayerStat, IDeWordle, PlayerStat};
 
     use dewordle::utils::{
-        compare_word, is_correct_hashed_word, hash_word, hash_letter, get_next_midnight_timestamp
+        compare_word, get_next_midnight_timestamp, hash_letter, hash_word, is_correct_hashed_word,
     };
     use openzeppelin::access::accesscontrol::{AccessControlComponent};
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::introspection::src5::SRC5Component;
 
     use starknet::storage::{
-        StoragePointerReadAccess, StoragePointerWriteAccess, Map, Vec, VecTrait, MutableVecTrait,
+        Map, MutableVecTrait, StoragePointerReadAccess, StoragePointerWriteAccess, Vec, VecTrait,
     };
 
     use starknet::{ContractAddress, get_block_timestamp};
@@ -64,6 +64,7 @@ pub mod DeWordle {
         #[flat]
         AccessControlEvent: AccessControlComponent::Event,
         DayUpdated: DayUpdated,
+        PlayerStatsReset: PlayerStatsReset,
     }
 
     #[constructor]
@@ -78,6 +79,12 @@ pub mod DeWordle {
     #[derive(Drop, starknet::Event)]
     struct DayUpdated {
         new_end_of_day: u64,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct PlayerStatsReset {
+        player: ContractAddress,
+        timestamp: u64,
     }
 
     #[abi(embed_v0)]
@@ -112,7 +119,11 @@ pub mod DeWordle {
             // A player without a stat will have 0 attempts remaining
             if daily_stat.attempt_remaining == 0 {
                 DailyPlayerStat {
-                    player: player, attempt_remaining: 6, has_won: false, won_at_attempt: 0,
+                    player: player,
+                    attempt_remaining: 6,
+                    has_won: false,
+                    won_at_attempt: 0,
+                    last_attempt_timestamp: 0,
                 }
             } else {
                 daily_stat
@@ -122,9 +133,14 @@ pub mod DeWordle {
         // TODO: remove this
         fn play(ref self: ContractState) {
             let caller: ContractAddress = starknet::get_caller_address();
+            let current_timestamp = get_block_timestamp();
 
             let new_daily_stat = DailyPlayerStat {
-                player: caller, attempt_remaining: 6, has_won: false, won_at_attempt: 0,
+                player: caller,
+                attempt_remaining: 6,
+                has_won: false,
+                won_at_attempt: 0,
+                last_attempt_timestamp: current_timestamp,
             };
 
             self.daily_player_stat.write(caller, new_daily_stat);
@@ -137,20 +153,38 @@ pub mod DeWordle {
         /// length, validates player has attempts remaining and hasn't already won @dev Updates
         /// player stats based on the outcome of the guess
         fn submit_guess(
-            ref self: ContractState, guessed_word: ByteArray
+            ref self: ContractState, guessed_word: ByteArray,
         ) -> Option<Span<LetterState>> {
             assert(guessed_word.len() == self.word_len.read().into(), 'Length does not match');
             let caller = starknet::get_caller_address();
-            let daily_stat = self.daily_player_stat.read(caller);
+            let current_timestamp = get_block_timestamp();
+
+            if current_timestamp >= self.end_of_day_timestamp.read() {
+                let new_end_of_day = get_next_midnight_timestamp();
+                self.end_of_day_timestamp.write(new_end_of_day);
+                self.emit(DayUpdated { new_end_of_day });
+
+                let new_daily_stat = DailyPlayerStat {
+                    player: caller,
+                    attempt_remaining: 6,
+                    has_won: false,
+                    won_at_attempt: 0,
+                    last_attempt_timestamp: current_timestamp,
+                };
+                self.daily_player_stat.write(caller, new_daily_stat);
+            }
+            let mut daily_stat = self.daily_player_stat.read(caller);
             assert(!daily_stat.has_won, 'Player has already won');
             assert(daily_stat.attempt_remaining > 0, 'Player has exhausted attempts');
+
             let hash_guessed_word = hash_word(guessed_word.clone());
             if is_correct_hashed_word(self._get_daily_word(), hash_guessed_word) {
                 let new_daily_stat = DailyPlayerStat {
                     player: caller,
                     attempt_remaining: daily_stat.attempt_remaining - 1,
                     has_won: true,
-                    won_at_attempt: 6 - daily_stat.attempt_remaining,
+                    won_at_attempt: 7 - (daily_stat.attempt_remaining - 1),
+                    last_attempt_timestamp: current_timestamp,
                 };
                 self.daily_player_stat.write(caller, new_daily_stat);
                 Option::None
@@ -160,6 +194,7 @@ pub mod DeWordle {
                     attempt_remaining: daily_stat.attempt_remaining - 1,
                     has_won: false,
                     won_at_attempt: 0,
+                    last_attempt_timestamp: current_timestamp,
                 };
                 self.daily_player_stat.write(caller, new_daily_stat);
                 Option::Some(compare_word(self._get_daily_letters(), guessed_word.clone()))

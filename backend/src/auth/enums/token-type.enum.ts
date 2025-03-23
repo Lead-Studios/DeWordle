@@ -1,7 +1,7 @@
 export enum TokenType {
   VERIFICATION = 'verification',
   PASSWORD_RESET = 'password_reset',
-  REFRESH = 'refresh',  
+  REFRESH = 'refresh',
 }
 
 // src/auth/interfaces/jwt-payload.interface.ts

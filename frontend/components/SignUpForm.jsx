@@ -1,12 +1,12 @@
-'use client';
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
-import Link from 'next/link';
-import { Formik, Form, Field } from 'formik';
-import { signUpSchema } from '@/utils/authValidationSchema';
-import { useSignup } from '@/app/hooks/useSignup';
+"use client";
+import React from "react";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { Formik, Form, Field } from "formik";
+import { signUpSchema } from "@/utils/authValidationSchema";
+import { useSignup } from "@/app/hooks/useSignup";
 
 const SignUpForm = () => {
   const router = useRouter();
@@ -18,22 +18,22 @@ const SignUpForm = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      router.push('/signin');
+      router.push("/signin");
     }
   }, [isSuccess, router]);
 
   const initialValues = {
-    username: '',
-    fullname: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    username: "",
+    fullname: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     terms: false,
   };
 
   const handleSubmit = async (values, { setSubmitting, setStatus }) => {
     try {
-      console.log('Form submitted with values:', values);
+      console.log("Form submitted with values:", values);
 
       const userData = {
         userName: values.username,
@@ -43,18 +43,18 @@ const SignUpForm = () => {
 
       mutate(userData, {
         onError: (err) => {
-          console.error('Submission error:', err);
+          console.error("Submission error:", err);
           setStatus({
             error:
               err.response?.data?.message ||
-              'Something went wrong. Please try again.',
+              "Something went wrong. Please try again.",
           });
           setSubmitting(false);
         },
       });
     } catch (error) {
-      console.error('Submission error:', error);
-      setStatus({ error: 'Something went wrong. Please try again.' });
+      console.error("Submission error:", error);
+      setStatus({ error: "Something went wrong. Please try again." });
       setSubmitting(false);
     }
   };
@@ -113,8 +113,8 @@ const SignUpForm = () => {
                     type="text"
                     className={`w-full px-3 py-2 border ${
                       touched.username && errors.username
-                        ? 'border-red-500'
-                        : 'border-gray-300'
+                        ? "border-red-500"
+                        : "border-gray-300"
                     } rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500`}
                     placeholder="Enter your name/nickname"
                   />
@@ -137,8 +137,8 @@ const SignUpForm = () => {
                     type="text"
                     className={`w-full px-3 py-2 border ${
                       touched.fullname && errors.fullname
-                        ? 'border-red-500'
-                        : 'border-gray-300'
+                        ? "border-red-500"
+                        : "border-gray-300"
                     } rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500`}
                     placeholder="Enter your name"
                   />
@@ -161,8 +161,8 @@ const SignUpForm = () => {
                     type="email"
                     className={`w-full px-3 py-2 border ${
                       touched.email && errors.email
-                        ? 'border-red-500'
-                        : 'border-gray-300'
+                        ? "border-red-500"
+                        : "border-gray-300"
                     } rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500`}
                     placeholder="Enter your email"
                   />
@@ -183,11 +183,11 @@ const SignUpForm = () => {
                   <div className="relative">
                     <Field
                       name="password"
-                      type={showPassword ? 'text' : 'password'}
+                      type={showPassword ? "text" : "password"}
                       className={`w-full px-3 py-2 border ${
                         touched.password && errors.password
-                          ? 'border-red-500'
-                          : 'border-gray-300'
+                          ? "border-red-500"
+                          : "border-gray-300"
                       } rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500`}
                       placeholder="Password"
                     />
@@ -196,7 +196,7 @@ const SignUpForm = () => {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
                       aria-label={
-                        showPassword ? 'Hide password' : 'Show password'
+                        showPassword ? "Hide password" : "Show password"
                       }
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -219,11 +219,11 @@ const SignUpForm = () => {
                   <div className="relative">
                     <Field
                       name="confirmPassword"
-                      type={showConfirmPassword ? 'text' : 'password'}
+                      type={showConfirmPassword ? "text" : "password"}
                       className={`w-full px-3 py-2 border ${
                         touched.confirmPassword && errors.confirmPassword
-                          ? 'border-red-500'
-                          : 'border-gray-300'
+                          ? "border-red-500"
+                          : "border-gray-300"
                       } rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500`}
                       placeholder="Password"
                     />
@@ -234,7 +234,7 @@ const SignUpForm = () => {
                       }
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none "
                       aria-label={
-                        showConfirmPassword ? 'Hide password' : 'Show password'
+                        showConfirmPassword ? "Hide password" : "Show password"
                       }
                     >
                       {showConfirmPassword ? (
@@ -270,7 +270,7 @@ const SignUpForm = () => {
                         htmlFor="terms"
                         className="font-medium text-gray-700"
                       >
-                        I agree to the{' '}
+                        I agree to the{" "}
                         <a
                           href="#"
                           className="text-indigo-600 hover:text-indigo-500"
@@ -291,7 +291,7 @@ const SignUpForm = () => {
                   type="submit"
                   disabled={isSubmitting || isPending || formEmpty}
                   className={`w-full bg-[#29296E] hover:bg-indigo-800 text-white py-2 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-6 ${
-                    formEmpty ? 'opacity-40' : 'opacity-100'
+                    formEmpty ? "opacity-40" : "opacity-100"
                   } flex items-center justify-center min-h-[44px]`}
                 >
                   {isSubmitting || isPending ? (
@@ -300,7 +300,7 @@ const SignUpForm = () => {
                       <span>Creating account...</span>
                     </>
                   ) : (
-                    'Create Account'
+                    "Create Account"
                   )}
                 </button>
 
@@ -310,7 +310,7 @@ const SignUpForm = () => {
 
                 <div className="text-center">
                   <p className="text-sm text-gray-600">
-                    Already have an account?{' '}
+                    Already have an account?{" "}
                     <Link
                       href="/login"
                       className="text-indigo-600 hover:text-indigo-800"
