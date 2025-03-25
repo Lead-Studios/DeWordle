@@ -46,6 +46,9 @@ pub mod DeWordle {
         player_stat: Map<ContractAddress, PlayerStat>,
         daily_player_stat: Map<ContractAddress, DailyPlayerStat>,
         end_of_day_timestamp: u64,
+        streaks: Map<ContractAddress, u32>,
+        max_streaks: Map<ContractAddress, u32>,
+        last_played_day: Map<ContractAddress, (u64, bool)>,
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
         #[substorage(v0)]
@@ -173,12 +176,38 @@ pub mod DeWordle {
                 };
                 self.daily_player_stat.write(caller, new_daily_stat);
             }
+
+            // this track streak OKK!
+            let (last_end_day_timestamp, streak_flag) = self.last_played_day.read(caller);
+            let today_end_day_timestamp = self.get_end_of_day_timestamp();
+
+            // Reset streak if a day is skipped
+            if today_end_day_timestamp > last_end_day_timestamp + SECONDS_IN_A_DAY {
+                self.streaks.write(caller, 0);
+            }
+            // reset the streak flag to prevent multi increase streak on smae day
+            if get_block_timestamp() > last_end_day_timestamp {
+                self.last_played_day.write(caller, (today_end_day_timestamp, false));
+            }
+
             let mut daily_stat = self.daily_player_stat.read(caller);
             assert(!daily_stat.has_won, 'Player has already won');
             assert(daily_stat.attempt_remaining > 0, 'Player has exhausted attempts');
 
             let hash_guessed_word = hash_word(guessed_word.clone());
             if is_correct_hashed_word(self._get_daily_word(), hash_guessed_word) {
+                if !streak_flag {
+                    let mut streak = self.streaks.read(caller);
+                    streak += 1;
+                    self.streaks.write(caller, streak);
+
+                    let max_streak = self.max_streaks.read(caller);
+                    if streak > max_streak {
+                        self.max_streaks.write(caller, streak);
+                    }
+                    self.last_played_day.write(caller, (today_end_day_timestamp, true));
+                }
+
                 let new_daily_stat = DailyPlayerStat {
                     player: caller,
                     attempt_remaining: daily_stat.attempt_remaining - 1,
@@ -220,6 +249,13 @@ pub mod DeWordle {
         /// @return u64 The Unix timestamp for the end of the current day
         fn get_end_of_day_timestamp(self: @ContractState) -> u64 {
             self.end_of_day_timestamp.read()
+        }
+
+        /// @notice Gets the players ( current stricks , max streaks )
+        /// @return (u32 ,u32) tuple contains first value currect streak , and second value is max
+        /// streak
+        fn get_player_streaks(self: @ContractState, player: ContractAddress) -> (u32, u32) {
+            (self.streaks.read(player), self.max_streaks.read(player))
         }
     }
 

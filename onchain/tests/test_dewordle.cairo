@@ -482,3 +482,43 @@ fn test_update_end_of_day_no_change_before_day_ends() {
     assert(updated_timestamp == initial_timestamp, 'Timestamp should not change');
 }
 
+#[test]
+fn test_player_daily_streaks() {
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address };
+
+    start_cheat_caller_address(contract_address, OWNER());
+
+    // Define and set the daily word
+    let daily_word = "slept";
+    dewordle.set_daily_word(daily_word.clone());
+
+    // Play
+    dewordle.play();
+
+    match dewordle.submit_guess("slept") {
+        Option::None => (),
+        Option::Some(_) => panic!("ERROR"),
+    }
+
+    let (streak, max_streak) = dewordle.get_player_streaks(OWNER());
+
+    assert(streak == 1_u32, 'streak_is_one');
+    assert(max_streak == 1_u32, 'max_streak_one');
+
+    // Fast forward time by more than a day
+    cheat_block_timestamp(contract_address, 86500 + 86500, CheatSpan::TargetCalls(1));
+
+    dewordle.set_daily_word(daily_word.clone());
+    // Play
+    dewordle.play();
+    match dewordle.submit_guess("slept") {
+        Option::None => (),
+        Option::Some(_) => panic!("ERROR"),
+    }
+
+    let (streak, max_streak) = dewordle.get_player_streaks(OWNER());
+    assert(streak == 1_u32, 'streak_is_one_on_fouth');
+    assert(max_streak == 1_u32, 'max_streak_is_one_on_fouth');
+}
+

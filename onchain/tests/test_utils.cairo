@@ -1,6 +1,6 @@
 use dewordle::constants::LetterState;
 use dewordle::utils::{
-    compare_word, is_correct_hashed_word, hash_word, hash_letter, get_next_midnight_timestamp
+    compare_word, get_next_midnight_timestamp, hash_letter, hash_word, is_correct_hashed_word,
 };
 use starknet::{get_block_timestamp};
 const SECONDS_IN_A_DAY: u64 = 86400;
@@ -11,17 +11,17 @@ fn test_compare_word_when_all_letters_are_correct() {
         hash_letter('t'.into()),
         hash_letter('e'.into()),
         hash_letter('s'.into()),
-        hash_letter('t'.into())
+        hash_letter('t'.into()),
     ];
 
     assert(
         compare_word(
-            daily_word, "test"
+            daily_word, "test",
         ) == array![
-            LetterState::CORRECT, LetterState::CORRECT, LetterState::CORRECT, LetterState::CORRECT
+            LetterState::CORRECT, LetterState::CORRECT, LetterState::CORRECT, LetterState::CORRECT,
         ]
             .span(),
-        'Word not compared correctly'
+        'Word not compared correctly',
     );
 }
 
@@ -31,17 +31,17 @@ fn test_compare_word_when_some_letters_are_misplaced() {
         hash_letter('t'.into()),
         hash_letter('e'.into()),
         hash_letter('s'.into()),
-        hash_letter('t'.into())
+        hash_letter('t'.into()),
     ];
 
     assert(
         compare_word(
-            daily_word, "tset"
+            daily_word, "tset",
         ) == array![
-            LetterState::CORRECT, LetterState::PRESENT, LetterState::PRESENT, LetterState::CORRECT
+            LetterState::CORRECT, LetterState::PRESENT, LetterState::PRESENT, LetterState::CORRECT,
         ]
             .span(),
-        'Word not compared correctly'
+        'Word not compared correctly',
     );
 }
 
@@ -51,17 +51,17 @@ fn test_compare_word_when_some_letters_are_absent() {
         hash_letter('t'.into()),
         hash_letter('e'.into()),
         hash_letter('s'.into()),
-        hash_letter('t'.into())
+        hash_letter('t'.into()),
     ];
 
     assert(
         compare_word(
-            daily_word, "tsec"
+            daily_word, "tsec",
         ) == array![
-            LetterState::CORRECT, LetterState::PRESENT, LetterState::PRESENT, LetterState::ABSENT
+            LetterState::CORRECT, LetterState::PRESENT, LetterState::PRESENT, LetterState::ABSENT,
         ]
             .span(),
-        'Word not compared correctly'
+        'Word not compared correctly',
     );
 }
 
@@ -73,7 +73,7 @@ fn test_compare_word_panics() {
         hash_letter('l'.into()),
         hash_letter('e'.into()),
         hash_letter('p'.into()),
-        hash_letter('t'.into())
+        hash_letter('t'.into()),
     ];
 
     compare_word(daily_word, "sweeps");
@@ -86,38 +86,38 @@ fn test_compare_word_when_some_letters_are_repeated() {
         hash_letter('l'.into()),
         hash_letter('e'.into()),
         hash_letter('p'.into()),
-        hash_letter('t'.into())
+        hash_letter('t'.into()),
     ];
 
     assert(
         compare_word(
-            daily_word, "sweep"
+            daily_word, "sweep",
         ) == array![
             LetterState::CORRECT,
             LetterState::ABSENT,
             LetterState::CORRECT,
             LetterState::ABSENT,
-            LetterState::PRESENT
+            LetterState::PRESENT,
         ]
             .span(),
-        'Word not compared correctly'
+        'Word not compared correctly',
     );
 
     let daily_word = array![
         hash_letter('t'.into()),
         hash_letter('e'.into()),
         hash_letter('s'.into()),
-        hash_letter('t'.into())
+        hash_letter('t'.into()),
     ];
 
     assert(
         compare_word(
-            daily_word, "less"
+            daily_word, "less",
         ) == array![
-            LetterState::ABSENT, LetterState::CORRECT, LetterState::CORRECT, LetterState::ABSENT
+            LetterState::ABSENT, LetterState::CORRECT, LetterState::CORRECT, LetterState::ABSENT,
         ]
             .span(),
-        'Word not compared correctly'
+        'Word not compared correctly',
     );
 }
 
