@@ -28,15 +28,6 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
             Continue with Apple
           </button>
 
-          <p className="mt-3 text-center text-md text-gray-600">
-            Already have an account?{" "}
-            <Link
-              href="/signin"
-              className="text-[#29296E] hover:border-b-[#29296E] text-md font-[700]"
-            >
-              Log In
-            </Link>
-          </p>
         </div>
       </main>
     </div>
