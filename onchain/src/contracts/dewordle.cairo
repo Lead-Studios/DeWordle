@@ -48,7 +48,7 @@ pub mod DeWordle {
         end_of_day_timestamp: u64,
         streaks: Map<ContractAddress, u32>,
         max_streaks: Map<ContractAddress, u32>,
-        last_played_day: Map<ContractAddress, (u64, bool)>,
+        last_played_day: Map<ContractAddress, u64>,
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
         #[substorage(v0)]
@@ -178,16 +178,12 @@ pub mod DeWordle {
             }
 
             // this track streak OKK!
-            let (last_end_day_timestamp, streak_flag) = self.last_played_day.read(caller);
-            let today_end_day_timestamp = self.get_end_of_day_timestamp();
+            let last_played_day = self.last_played_day.read(caller);
+            let today_played_day = self.get_end_of_day_timestamp();
 
             // Reset streak if a day is skipped
-            if today_end_day_timestamp > last_end_day_timestamp + SECONDS_IN_A_DAY {
+            if today_played_day > last_played_day + SECONDS_IN_A_DAY {
                 self.streaks.write(caller, 0);
-            }
-            // reset the streak flag to prevent multi increase streak on smae day
-            if get_block_timestamp() > last_end_day_timestamp {
-                self.last_played_day.write(caller, (today_end_day_timestamp, false));
             }
 
             let mut daily_stat = self.daily_player_stat.read(caller);
@@ -196,7 +192,7 @@ pub mod DeWordle {
 
             let hash_guessed_word = hash_word(guessed_word.clone());
             if is_correct_hashed_word(self._get_daily_word(), hash_guessed_word) {
-                if !streak_flag {
+                if today_played_day > last_played_day {
                     let mut streak = self.streaks.read(caller);
                     streak += 1;
                     self.streaks.write(caller, streak);
@@ -205,7 +201,7 @@ pub mod DeWordle {
                     if streak > max_streak {
                         self.max_streaks.write(caller, streak);
                     }
-                    self.last_played_day.write(caller, (today_end_day_timestamp, true));
+                    self.last_played_day.write(caller, today_played_day);
                 }
 
                 let new_daily_stat = DailyPlayerStat {
