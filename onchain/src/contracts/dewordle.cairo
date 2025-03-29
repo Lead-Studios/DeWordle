@@ -96,30 +96,34 @@ pub mod DeWordle {
         fn set_daily_word(ref self: ContractState, word: ByteArray) {
             self.accesscontrol.assert_only_role(ADMIN_ROLE);
 
-    // Ensure the word is set only once per day
-    assert(
-        get_block_timestamp() >= self.end_of_day_timestamp.read(),
-        'Cannot set word before the current day ends'
-    );
+            // Check if we can set a new word today
+            let current_timestamp = get_block_timestamp();
+            let end_of_day = self.end_of_day_timestamp.read();
 
-    let word_len = word.len();
-    let hash_word = hash_word(word.clone());
-    self.word_of_the_day.write(hash_word);
-    let mut i = 0;
+            // Ensure we can only set a word once per day
+            assert(current_timestamp >= end_of_day, 'Word already set for today');
 
-    while (i < word_len) {
-        let hashed_letter = hash_letter(word[i].into());
-        self.letters_in_word.append().write(hashed_letter);
-        i += 1;
-    };
+            // Set the word
+            let word_len = word.len();
+            let hash_word = hash_word(word.clone());
+            self.word_of_the_day.write(hash_word);
 
-    self.word_len.write(word_len.try_into().unwrap());
+            // add the letters
+            let mut i = 0;
+            while (i < word_len) {
+                let hashed_letter = hash_letter(word[i].into());
+                self.letters_in_word.append().write(hashed_letter);
+                i += 1;
+            };
 
-    // Update the end of day timestamp to the next midnight
-    let new_end_of_day = get_next_midnight_timestamp();
-    self.end_of_day_timestamp.write(new_end_of_day);
-    self.emit(DayUpdated { new_end_of_day });
-}
+            self.word_len.write(word_len.try_into().unwrap());
+
+            // Update end_of_day_timestamp to next day
+            // Assuming one day is 86400 seconds (24 hours)
+            let one_day_in_seconds: u64 = 86400;
+            let next_reset_time = current_timestamp + one_day_in_seconds;
+            self.end_of_day_timestamp.write(next_reset_time);
+        }
 
         /// @notice Retrieves a player's daily statistics
         /// @param player: The address of the player
