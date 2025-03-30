@@ -33,8 +33,6 @@ const SignUpForm = () => {
 
   const handleSubmit = async (values, { setSubmitting, setStatus }) => {
     try {
-      console.log("Form submitted with values:", values);
-
       const userData = {
         userName: values.username,
         email: values.email,

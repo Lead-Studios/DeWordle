@@ -7,6 +7,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { Formik, Form, Field } from 'formik';
 import { signInSchema } from '@/utils/authValidationSchema';
 import { useSignin } from '@/app/hooks/useSignIn';
+import Cookies from 'js-cookie';
 
 const SignInForm = () => {
   const router = useRouter();
@@ -15,6 +16,11 @@ const SignInForm = () => {
 
   useEffect(() => {
     if (isSuccess) {
+
+      const accessToken = Cookies.get('accessToken');
+      if (!accessToken) {
+        router.push('/signin');
+      }
       router.push('/game');
     }
   }, [isSuccess, router]);
@@ -27,7 +33,6 @@ const SignInForm = () => {
   const handleSubmit = async (values, { setSubmitting, setStatus }) => {
     try {
       // Handle form submission logic here
-      console.log('Form submitted:', values);
       const userData = {
         email: values.email,
         password: values.password,
@@ -83,11 +88,10 @@ const SignInForm = () => {
                 id="email"
                 name="email"
                 placeholder="Enter your email"
-                className={`w-full px-3 py-2 border text-[16px] placeholder-[#9F9F9F] ${
-                  touched.email && errors.email
-                    ? 'border-red-500'
-                    : 'border-[#535353]'
-                } rounded-md h-[54px] focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                className={`w-full px-3 py-2 border text-[16px] placeholder-[#9F9F9F] ${touched.email && errors.email
+                  ? 'border-red-500'
+                  : 'border-[#535353]'
+                  } rounded-md h-[54px] focus:outline-none focus:ring-2 focus:ring-blue-500`}
               />
               {touched.email && errors.email && (
                 <div className="text-red-500 text-sm mt-1">{errors.email}</div>
@@ -107,11 +111,10 @@ const SignInForm = () => {
                   id="password"
                   name="password"
                   placeholder="Password"
-                  className={`appearance-none w-full px-3 py-2 border text-[16px] placeholder-[#9F9F9F] ${
-                    touched.password && errors.password
-                      ? 'border-red-500'
-                      : 'border-[#535353]'
-                  } rounded-md h-[54px] focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  className={`appearance-none w-full px-3 py-2 border text-[16px] placeholder-[#9F9F9F] ${touched.password && errors.password
+                    ? 'border-red-500'
+                    : 'border-[#535353]'
+                    } rounded-md h-[54px] focus:outline-none focus:ring-2 focus:ring-blue-500`}
                   style={{ WebkitAppearance: 'none' }}
                   autoComplete="current-password"
                 />

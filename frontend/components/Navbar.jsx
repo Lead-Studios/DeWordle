@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DewordleIcon from "@/assets/dewordleIcon.svg";
+import Cookies from 'js-cookie';
+
 import {
   BarChartIcon,
   Settings as SettingsIcon,
@@ -24,12 +26,7 @@ const Navbar = () => {
   const profileButtonRef = useRef(null);
   const router = useRouter();
   const { userData } = useContext(AppContext);
-  console.log('userData from navabr', userData);
-  const user = {
-    name: "John Stones",
-    email: "johnstones1@gmail.com",
-    avatar: "/avatar.jpg",
-  };
+
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -60,11 +57,15 @@ const Navbar = () => {
 
   // Navigation handlers
   const handleNavigation = (path) => {
-    localStorage.removeItem('authToken'); // or whatever key you use
-    router.push('/');
-
+    if (path === "/logout") {
+      Cookies.remove('accessToken');
+      Cookies.remove('refreshToken');
+      localStorage.removeItem('currentUser');
+      router.push('/');
+      
+    }
     setIsProfileOpen(false);
-    // router.push(path);
+    router.push(path);
   };
 
   return (
@@ -95,7 +96,7 @@ const Navbar = () => {
               <div className="w-8 h-8 rounded-full  overflow-hidden flex items-center justify-center border-2 border-[#29296E]">
                 {userData.avatar ? (
                   <Image
-                    src={userData.avatar ||user.avatar}
+                    src={userData.avatar}
                     alt={userData.name}
                     width={32}
                     height={32}

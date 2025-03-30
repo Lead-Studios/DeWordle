@@ -25,6 +25,7 @@
     "framer-motion": "^12.5.0",
     "frontend": "file:",
     "gsap": "^3.12.7",
+    "js-cookie": "^3.0.5",
     "lucide-react": "^0.473.0",
     "next": "15.1.4",
     "next-auth": "^4.24.11",

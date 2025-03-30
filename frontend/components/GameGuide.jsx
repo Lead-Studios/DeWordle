@@ -291,11 +291,8 @@ export default function DewordleTutorial() {
                 <button
                   onClick={prevStep}
                   disabled={currentStep === 0}
-                  className={`flex items-center gap-1 px-4 py-2 rounded-lg transition-colors ${
-                    currentStep === 0
-                      ? "bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500"
-                      : "bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200"
-                  }`}
+                  className={`flex items-center gap-1 px-4 py-2 rounded-lg transition-colors ${currentStep === 0 ? "bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500"                      : "bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200"
+                    }`}
                 >
                   <ChevronLeft className="w-4 h-4" />
                   Previous

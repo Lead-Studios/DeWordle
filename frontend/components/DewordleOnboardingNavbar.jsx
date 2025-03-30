@@ -8,7 +8,7 @@ import HowToPlayModal from "./HowToPlayModal";
 import Link from "next/link";
 
 const DewordleOnboardingNavbar = () => {
-  const [isHelpGuideOpen, setIsHelpGuideOpen] = useState(false);
+  const [isHelpGuideOpen, setIsHelpGuideOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const helpGuideRef = useRef(null);
 
@@ -59,9 +59,8 @@ const DewordleOnboardingNavbar = () => {
             >
               How to play
               <ChevronDown
-                className={`w-4 h-4 transition-transform duration-200 ${
-                  isHelpGuideOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`w-4 h-4 transition-transform duration-200 ${isHelpGuideOpen ? "rotate-180" : "rotate-0"
+                  }`}
               />
             </button>
 
