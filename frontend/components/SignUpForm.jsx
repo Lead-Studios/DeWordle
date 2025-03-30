@@ -303,17 +303,6 @@ const SignUpForm = () => {
                   <span className="mx-4 text-gray-500 text-sm">or</span>
                 </div>
 
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">
-                    Already have an account?{" "}
-                    <Link
-                      href="/login"
-                      className="text-indigo-600 hover:text-indigo-800"
-                    >
-                      Sign in
-                    </Link>
-                  </p>
-                </div>
               </Form>
             );
           }}

@@ -2,13 +2,16 @@ use dewordle::interfaces::{IDeWordleDispatcher, IDeWordleDispatcherTrait};
 // use dewordle::utils::{hash_letter, hash_word};
 use snforge_std::{
     CheatSpan, ContractClassTrait, DeclareResultTrait, cheat_block_timestamp, declare,
-    start_cheat_caller_address, stop_cheat_caller_address,
+    start_cheat_caller_address, stop_cheat_caller_address, start_cheat_block_timestamp,
+    start_cheat_block_timestamp_global
 };
-use starknet::ContractAddress;
+use starknet::{ContractAddress, get_block_timestamp};
 
 fn OWNER() -> ContractAddress {
     'OWNER'.try_into().unwrap()
 }
+
+const ONE_DAY_IN_SECONDS: u64 = 86400;
 
 fn deploy_contract() -> ContractAddress {
     let contract = declare("DeWordle").unwrap().contract_class();
@@ -16,25 +19,81 @@ fn deploy_contract() -> ContractAddress {
     let owner: ContractAddress = OWNER().try_into().unwrap();
     owner.serialize(ref constructor_calldata);
     let (contract_address, _) = contract.deploy(@constructor_calldata).unwrap();
+
+    // Set initial time
+    let initial_time: u64 = ONE_DAY_IN_SECONDS;
+    start_cheat_block_timestamp_global(initial_time);
+
     contract_address
 }
 
-// #[test]
-// fn test_set_daily_word() {
-//     // Deploy the contract
-//     let contract_address = deploy_contract();
-//     let dewordle = IDeWordleDispatcher { contract_address: contract_address };
+#[test]
+fn test_set_daily_word() {
+    // Setup
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address: contract_address };
+    let initial_time = ONE_DAY_IN_SECONDS;
 
-//     start_cheat_caller_address(contract_address, OWNER());
+    start_cheat_caller_address(contract_address, OWNER());
 
-//     // Define and set the daily word
-//     let daily_word = "test";
-//     dewordle.set_daily_word(daily_word.clone());
+    // Test first call - should succeed
+    let word1: ByteArray = "HELLO";
+    dewordle.set_daily_word(word1.clone());
+    dewordle.play();
+    match dewordle.submit_guess(word1.clone()) {
+        Option::None => (),
+        Option::Some(_) => panic!("ERROR"),
+    }
 
-//     // Verify that the daily word was set correctly
-//     assert(dewordle.get_daily_word() == hash_word(daily_word), 'Daily word not stored
-//     correctly');
-// }
+    // Verify end_of_day_timestamp was updated
+    let expected_reset_time = initial_time + ONE_DAY_IN_SECONDS;
+    assert(dewordle.get_end_of_day_timestamp() == expected_reset_time, 'Reset time not updated');
+
+    // Advance time to next day
+    start_cheat_block_timestamp(contract_address, expected_reset_time);
+
+    // Test call after time advancement - should succeed
+    let word2: ByteArray = "WORLD";
+    dewordle.set_daily_word(word2.clone());
+    dewordle.play();
+    match dewordle.submit_guess(word2.clone()) {
+        Option::None => (),
+        Option::Some(_) => panic!("ERROR"),
+    }
+
+    // Verify end_of_day_timestamp was updated again
+    let next_reset_time = expected_reset_time + ONE_DAY_IN_SECONDS;
+    assert(dewordle.get_end_of_day_timestamp() == next_reset_time, 'Reset time not updated');
+}
+
+#[test]
+#[should_panic(expected: 'Word already set for today')]
+fn test_set_daily_word_when_already_set_for_a_day() {
+    // Setup
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address: contract_address };
+    let initial_time = ONE_DAY_IN_SECONDS;
+
+    start_cheat_caller_address(contract_address, OWNER());
+
+    // Test first call - should succeed
+    let word1: ByteArray = "HELLO";
+    dewordle.set_daily_word(word1.clone());
+    dewordle.play();
+    match dewordle.submit_guess(word1.clone()) {
+        Option::None => (),
+        Option::Some(_) => panic!("ERROR"),
+    }
+
+    // Verify end_of_day_timestamp was updated
+    let expected_reset_time = initial_time + ONE_DAY_IN_SECONDS;
+    assert(dewordle.get_end_of_day_timestamp() == expected_reset_time, 'Reset time not updated');
+
+    // Test second call without time advancement - should fail
+    let word2: ByteArray = "WORLD";
+
+    dewordle.set_daily_word(word2.clone());
+}
 
 #[test]
 fn test_play_initializes_daily_player_stat() {
@@ -381,6 +440,9 @@ fn test_update_end_of_day() {
     let dewordle = IDeWordleDispatcher { contract_address };
     start_cheat_caller_address(contract_address, OWNER());
 
+    // reset timestamp to zero as it doesn't seem to affect the constructor
+    start_cheat_block_timestamp_global(0);
+
     // Get initial timestamp
     let initial_timestamp = dewordle.get_end_of_day_timestamp();
 
@@ -459,6 +521,9 @@ fn test_constructor_sets_timestamp() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address };
 
+    // reset timestamp to zero as it doesn't seem to affect the constructor
+    start_cheat_block_timestamp_global(0);
+
     // Get the end of day timestamp
     let timestamp = dewordle.get_end_of_day_timestamp();
 
@@ -470,6 +535,9 @@ fn test_constructor_sets_timestamp() {
 fn test_update_end_of_day_no_change_before_day_ends() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address };
+
+    // reset timestamp to zero as it doesn't seem to affect the constructor
+    start_cheat_block_timestamp_global(0);
 
     // Get initial timestamp
     let initial_timestamp = dewordle.get_end_of_day_timestamp();

@@ -95,11 +95,21 @@ pub mod DeWordle {
         /// @dev Hashes the word and stores it, along with each individual letter
         fn set_daily_word(ref self: ContractState, word: ByteArray) {
             self.accesscontrol.assert_only_role(ADMIN_ROLE);
+
+            // Check if a new word can be set today
+            let current_timestamp = get_block_timestamp();
+            let end_of_day = self.end_of_day_timestamp.read();
+
+            // Ensure word can only set once per day
+            assert(current_timestamp >= end_of_day, 'Word already set for today');
+
+            // Set the word
             let word_len = word.len();
             let hash_word = hash_word(word.clone());
             self.word_of_the_day.write(hash_word);
-            let mut i = 0;
 
+            // add the letters
+            let mut i = 0;
             while (i < word_len) {
                 let hashed_letter = hash_letter(word[i].into());
                 self.letters_in_word.append().write(hashed_letter);
@@ -107,6 +117,12 @@ pub mod DeWordle {
             };
 
             self.word_len.write(word_len.try_into().unwrap());
+
+            // Update end_of_day_timestamp to next day
+            // Assuming one day is 86400 seconds (24 hours)
+            let one_day_in_seconds: u64 = 86400;
+            let next_reset_time = current_timestamp + one_day_in_seconds;
+            self.end_of_day_timestamp.write(next_reset_time);
         }
 
         /// @notice Retrieves a player's daily statistics

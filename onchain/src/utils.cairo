@@ -94,6 +94,7 @@ pub fn hash_letter(letter: felt252) -> felt252 {
 
 pub fn get_next_midnight_timestamp() -> u64 {
     let current_timestamp = get_block_timestamp();
+
     let seconds_since_midnight = current_timestamp % SECONDS_IN_A_DAY;
     current_timestamp - seconds_since_midnight + SECONDS_IN_A_DAY
 }
