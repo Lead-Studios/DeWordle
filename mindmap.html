@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeWordle Mind Map</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+        }
+
+        .mindmap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .root {
+            background: #4CAF50;
+            color: white;
+            padding: 20px;
+            border-radius: 50%;
+            margin-bottom: 40px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .branches {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .branch {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 200px;
+        }
+
+        .branch-title {
+            color: #2196F3;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #2196F3;
+            padding-bottom: 5px;
+        }
+
+        .items {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .items li {
+            background: #e3f2fd;
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 5px;
+            transition: transform 0.2s;
+        }
+
+        .items li:hover {
+            transform: scale(1.05);
+            background: #bbdefb;
+        }
+
+        .connector {
+            position: absolute;
+            background: #90caf9;
+            height: 2px;
+            transform-origin: left center;
+        }
+    </style>
+</head>
+<body>
+    <div class="mindmap">
+        <div class="root">DeWordle</div>
+        <div class="branches">
+            <div class="branch">
+                <div class="branch-title">Frontend</div>
+                <ul class="items">
+                    <li>Next.js</li>
+                    <li>Tailwind CSS</li>
+                    <li>starknet.js</li>
+                    <li>Wallet Integration</li>
+                </ul>
+            </div>
+            <div class="branch">
+                <div class="branch-title">Smart Contracts</div>
+                <ul class="items">
+                    <li>Cairo</li>
+                    <li>Word Storage</li>
+                    <li>Guess Validation</li>
+                    <li>Reward System</li>
+                </ul>
+            </div>
+            <div class="branch">
+                <div class="branch-title">Backend & Storage</div>
+                <ul class="items">
+                    <li>IPFS</li>
+                    <li>On-chain Metadata</li>
+                </ul>
+            </div>
+            <div class="branch">
+                <div class="branch-title">Features</div>
+                <ul class="items">
+                    <li>Daily Word Challenges</li>
+                    <li>Transparent Gameplay</li>
+                    <li>Wallet Integration</li>
+                    <li>On-chain Rewards</li>
+                    <li>Leaderboards</li>
+                </ul>
+            </div>
+            <div class="branch">
+                <div class="branch-title">Game Flow</div>
+                <ul class="items">
+                    <li>Login</li>
+                    <li>Play</li>
+                    <li>Rewards</li>
+                    <li>Leaderboard</li>
+                </ul>
+            </div>
+            <div class="branch">
+                <div class="branch-title">Development</div>
+                <ul class="items">
+                    <li>MVP</li>
+                    <li>Advanced Features</li>
+                    <li>Launch</li>
+                </ul>
+            </div>
+            <div class="branch">
+                <div class="branch-title">Technical Stack</div>
+                <ul class="items">
+                    <li>StarkNet</li>
+                    <li>Vercel</li>
+                    <li>IPFS</li>
+                    <li>Cairo</li>
+                </ul>
+            </div>
+            <div class="branch">
+                <div class="branch-title">Database Schema</div>
+                <ul class="items">
+                    <li>User Entity</li>
+                    <li>Result Entity</li>
+                    <li>Leaderboard Entity</li>
+                    <li>Admin Entity</li>
+                    <li>SubAdmin Entity</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add hover effects and animations
+        document.querySelectorAll('.items li').forEach(item => {
+            item.addEventListener('mouseover', () => {
+                item.style.transform = 'scale(1.05)';
+                item.style.backgroundColor = '#bbdefb';
+            });
+            
+            item.addEventListener('mouseout', () => {
+                item.style.transform = 'scale(1)';
+                item.style.backgroundColor = '#e3f2fd';
+            });
+        });
+    </script>
+</body>
+</html> 

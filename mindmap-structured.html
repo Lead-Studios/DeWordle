@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeWordle Structured Mind Map</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+        }
+
+        .tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .root {
+            background: #4CAF50;
+            color: white;
+            padding: 20px;
+            border-radius: 50%;
+            margin-bottom: 40px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .root::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            width: 2px;
+            height: 40px;
+            background: #90caf9;
+            transform: translateX(-50%);
+        }
+
+        .level {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .level::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            width: 80%;
+            height: 2px;
+            background: #90caf9;
+            transform: translateX(-50%);
+        }
+
+        .node {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 200px;
+            position: relative;
+        }
+
+        .node::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            width: 2px;
+            height: 20px;
+            background: #90caf9;
+            transform: translateX(-50%);
+        }
+
+        .node-title {
+            color: #2196F3;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #2196F3;
+            padding-bottom: 5px;
+        }
+
+        .items {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .items li {
+            background: #e3f2fd;
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .items li:hover {
+            transform: scale(1.05);
+            background: #bbdefb;
+            cursor: pointer;
+        }
+
+        .sub-items {
+            list-style: none;
+            padding-left: 15px;
+            margin-top: 5px;
+        }
+
+        .sub-items li {
+            background: #f5f5f5;
+            font-size: 0.9em;
+        }
+
+        .legend {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="tree">
+        <div class="root">DeWordle</div>
+        
+        <div class="level">
+            <div class="node">
+                <div class="node-title">Frontend</div>
+                <ul class="items">
+                    <li>Next.js
+                        <ul class="sub-items">
+                            <li>React Components</li>
+                            <li>Routing</li>
+                            <li>State Management</li>
+                        </ul>
+                    </li>
+                    <li>Tailwind CSS
+                        <ul class="sub-items">
+                            <li>Responsive Design</li>
+                            <li>Custom Components</li>
+                        </ul>
+                    </li>
+                    <li>starknet.js
+                        <ul class="sub-items">
+                            <li>Wallet Connection</li>
+                            <li>Transaction Handling</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="node">
+                <div class="node-title">Smart Contracts</div>
+                <ul class="items">
+                    <li>Cairo
+                        <ul class="sub-items">
+                            <li>Contract Logic</li>
+                            <li>State Management</li>
+                        </ul>
+                    </li>
+                    <li>Word Storage
+                        <ul class="sub-items">
+                            <li>Daily Words</li>
+                            <li>Validation</li>
+                        </ul>
+                    </li>
+                    <li>Reward System
+                        <ul class="sub-items">
+                            <li>Token Distribution</li>
+                            <li>NFT Rewards</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="level">
+            <div class="node">
+                <div class="node-title">Backend</div>
+                <ul class="items">
+                    <li>API Services
+                        <ul class="sub-items">
+                            <li>User Management</li>
+                            <li>Game Logic</li>
+                            <li>Leaderboard</li>
+                        </ul>
+                    </li>
+                    <li>Database
+                        <ul class="sub-items">
+                            <li>PostgreSQL</li>
+                            <li>TypeORM</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="node">
+                <div class="node-title">Storage</div>
+                <ul class="items">
+                    <li>IPFS
+                        <ul class="sub-items">
+                            <li>Metadata Storage</li>
+                            <li>NFT Assets</li>
+                        </ul>
+                    </li>
+                    <li>On-chain Data
+                        <ul class="sub-items">
+                            <li>Game State</li>
+                            <li>Player Stats</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="level">
+            <div class="node">
+                <div class="node-title">Database Schema</div>
+                <ul class="items">
+                    <li>User Entity
+                        <ul class="sub-items">
+                            <li>Profile Data</li>
+                            <li>Game History</li>
+                        </ul>
+                    </li>
+                    <li>Result Entity
+                        <ul class="sub-items">
+                            <li>Game Stats</li>
+                            <li>Performance</li>
+                        </ul>
+                    </li>
+                    <li>Leaderboard Entity
+                        <ul class="sub-items">
+                            <li>Rankings</li>
+                            <li>Achievements</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="node">
+                <div class="node-title">Features</div>
+                <ul class="items">
+                    <li>Game Mechanics
+                        <ul class="sub-items">
+                            <li>Word Guessing</li>
+                            <li>Daily Challenges</li>
+                        </ul>
+                    </li>
+                    <li>Social Features
+                        <ul class="sub-items">
+                            <li>Leaderboards</li>
+                            <li>Achievements</li>
+                        </ul>
+                    </li>
+                    <li>Rewards
+                        <ul class="sub-items">
+                            <li>Tokens</li>
+                            <li>NFTs</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background: #4CAF50;"></div>
+            <span>Root Component</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #2196F3;"></div>
+            <span>Main Categories</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #e3f2fd;"></div>
+            <span>Components</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #f5f5f5;"></div>
+            <span>Sub-components</span>
+        </div>
+    </div>
+
+    <script>
+        // Add hover effects and animations
+        document.querySelectorAll('.items li').forEach(item => {
+            item.addEventListener('mouseover', () => {
+                item.style.transform = 'scale(1.05)';
+                item.style.backgroundColor = '#bbdefb';
+            });
+            
+            item.addEventListener('mouseout', () => {
+                item.style.transform = 'scale(1)';
+                item.style.backgroundColor = '#e3f2fd';
+            });
+        });
+    </script>
+</body>
+</html> 

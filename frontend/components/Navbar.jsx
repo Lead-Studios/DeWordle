@@ -62,7 +62,7 @@ const Navbar = () => {
       Cookies.remove('refreshToken');
       localStorage.removeItem('currentUser');
       router.push('/');
-
+      
     }
     setIsProfileOpen(false);
     router.push(path);

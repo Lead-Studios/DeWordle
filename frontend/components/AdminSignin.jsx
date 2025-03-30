@@ -6,8 +6,8 @@ import { Eye, EyeOff } from "lucide-react";
 const AdminSignin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
-
   return (
+    
     <div className="flex mt-10  items-center justify-center px-4">
       <div className="w-full max-w-[498px] bg-white px-6  sm:px-12">
         {/* Title */}

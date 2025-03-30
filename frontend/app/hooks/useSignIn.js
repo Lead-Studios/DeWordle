@@ -22,6 +22,12 @@ export function useSignin() {
       Cookies.set('refreshToken', refreshToken, { expires: 7 });
       localStorage.setItem('authToken', res.data[0].token);
       localStorage.setItem('currentUser', JSON.stringify(userData));
+      if (localStorage.getItem("isFirstTime") === "true" || localStorage.getItem("isFirstTime") == "false") {
+        localStorage.setItem("isFirstTime", false);
+      }
+      else {
+        localStorage.setItem("isFirstTime", true);
+      }
       toast.success("Sign In Successfully");
     },
     onError: (error) => {
