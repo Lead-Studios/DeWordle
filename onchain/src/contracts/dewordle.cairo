@@ -96,11 +96,11 @@ pub mod DeWordle {
         fn set_daily_word(ref self: ContractState, word: ByteArray) {
             self.accesscontrol.assert_only_role(ADMIN_ROLE);
 
-            // Check if we can set a new word today
+            // Check if a new word can be set today
             let current_timestamp = get_block_timestamp();
             let end_of_day = self.end_of_day_timestamp.read();
 
-            // Ensure we can only set a word once per day
+            // Ensure word can only set once per day
             assert(current_timestamp >= end_of_day, 'Word already set for today');
 
             // Set the word

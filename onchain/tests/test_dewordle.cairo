@@ -2,7 +2,8 @@ use dewordle::interfaces::{IDeWordleDispatcher, IDeWordleDispatcherTrait};
 // use dewordle::utils::{hash_letter, hash_word};
 use snforge_std::{
     CheatSpan, ContractClassTrait, DeclareResultTrait, cheat_block_timestamp, declare,
-    start_cheat_caller_address, stop_cheat_caller_address, start_cheat_block_timestamp
+    start_cheat_caller_address, stop_cheat_caller_address, start_cheat_block_timestamp,
+    start_cheat_block_timestamp_global
 };
 use starknet::{ContractAddress, get_block_timestamp};
 
@@ -16,6 +17,12 @@ fn deploy_contract() -> ContractAddress {
     let owner: ContractAddress = OWNER().try_into().unwrap();
     owner.serialize(ref constructor_calldata);
     let (contract_address, _) = contract.deploy(@constructor_calldata).unwrap();
+
+    // Set initial time
+    let one_day_in_seconds: u64 = 86400;
+    let initial_time: u64 = one_day_in_seconds;
+    start_cheat_block_timestamp_global(initial_time);
+
     contract_address
 }
 
@@ -263,6 +270,11 @@ fn test_submit_guess_panics_with_length_does_not_match() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address };
 
+    // Set initial time
+    let one_day_in_seconds: u64 = 86400;
+    let initial_time: u64 = one_day_in_seconds * 2;
+    start_cheat_block_timestamp(contract_address, initial_time);
+
     start_cheat_caller_address(contract_address, OWNER());
 
     // Define and set the daily word
@@ -442,6 +454,9 @@ fn test_update_end_of_day() {
     let dewordle = IDeWordleDispatcher { contract_address };
     start_cheat_caller_address(contract_address, OWNER());
 
+    // reset timestamp to zero as it doesn't seem to affect the constructor
+    start_cheat_block_timestamp_global(0);
+
     // Get initial timestamp
     let initial_timestamp = dewordle.get_end_of_day_timestamp();
 
@@ -520,6 +535,9 @@ fn test_constructor_sets_timestamp() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address };
 
+    // reset timestamp to zero as it doesn't seem to affect the constructor
+    start_cheat_block_timestamp_global(0);
+
     // Get the end of day timestamp
     let timestamp = dewordle.get_end_of_day_timestamp();
 
@@ -531,6 +549,9 @@ fn test_constructor_sets_timestamp() {
 fn test_update_end_of_day_no_change_before_day_ends() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address };
+
+    // reset timestamp to zero as it doesn't seem to affect the constructor
+    start_cheat_block_timestamp_global(0);
 
     // Get initial timestamp
     let initial_timestamp = dewordle.get_end_of_day_timestamp();
