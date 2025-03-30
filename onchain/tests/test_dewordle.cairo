@@ -11,6 +11,8 @@ fn OWNER() -> ContractAddress {
     'OWNER'.try_into().unwrap()
 }
 
+const ONE_DAY_IN_SECONDS: u64 = 86400;
+
 fn deploy_contract() -> ContractAddress {
     let contract = declare("DeWordle").unwrap().contract_class();
     let mut constructor_calldata = array![];
@@ -19,8 +21,7 @@ fn deploy_contract() -> ContractAddress {
     let (contract_address, _) = contract.deploy(@constructor_calldata).unwrap();
 
     // Set initial time
-    let one_day_in_seconds: u64 = 86400;
-    let initial_time: u64 = one_day_in_seconds;
+    let initial_time: u64 = ONE_DAY_IN_SECONDS;
     start_cheat_block_timestamp_global(initial_time);
 
     contract_address
@@ -31,14 +32,9 @@ fn test_set_daily_word() {
     // Setup
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address: contract_address };
+    let initial_time = ONE_DAY_IN_SECONDS;
 
     start_cheat_caller_address(contract_address, OWNER());
-
-    // Set initial time
-    let one_day_in_seconds: u64 = 86400;
-    let initial_time: u64 = one_day_in_seconds * 2;
-
-    start_cheat_block_timestamp(contract_address, initial_time);
 
     // Test first call - should succeed
     let word1: ByteArray = "HELLO";
@@ -50,7 +46,7 @@ fn test_set_daily_word() {
     }
 
     // Verify end_of_day_timestamp was updated
-    let expected_reset_time = initial_time + one_day_in_seconds;
+    let expected_reset_time = initial_time + ONE_DAY_IN_SECONDS;
     assert(dewordle.get_end_of_day_timestamp() == expected_reset_time, 'Reset time not updated');
 
     // Advance time to next day
@@ -66,7 +62,7 @@ fn test_set_daily_word() {
     }
 
     // Verify end_of_day_timestamp was updated again
-    let next_reset_time = expected_reset_time + one_day_in_seconds;
+    let next_reset_time = expected_reset_time + ONE_DAY_IN_SECONDS;
     assert(dewordle.get_end_of_day_timestamp() == next_reset_time, 'Reset time not updated');
 }
 
@@ -76,14 +72,9 @@ fn test_set_daily_word_when_already_set_for_a_day() {
     // Setup
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address: contract_address };
+    let initial_time = ONE_DAY_IN_SECONDS;
 
     start_cheat_caller_address(contract_address, OWNER());
-
-    // Set initial time
-    let one_day_in_seconds: u64 = 86400;
-    let initial_time: u64 = one_day_in_seconds * 2;
-
-    start_cheat_block_timestamp(contract_address, initial_time);
 
     // Test first call - should succeed
     let word1: ByteArray = "HELLO";
@@ -95,7 +86,7 @@ fn test_set_daily_word_when_already_set_for_a_day() {
     }
 
     // Verify end_of_day_timestamp was updated
-    let expected_reset_time = initial_time + one_day_in_seconds;
+    let expected_reset_time = initial_time + ONE_DAY_IN_SECONDS;
     assert(dewordle.get_end_of_day_timestamp() == expected_reset_time, 'Reset time not updated');
 
     // Test second call without time advancement - should fail
@@ -269,11 +260,6 @@ fn test_play_after_losing() {
 fn test_submit_guess_panics_with_length_does_not_match() {
     let contract_address = deploy_contract();
     let dewordle = IDeWordleDispatcher { contract_address };
-
-    // Set initial time
-    let one_day_in_seconds: u64 = 86400;
-    let initial_time: u64 = one_day_in_seconds * 2;
-    start_cheat_block_timestamp(contract_address, initial_time);
 
     start_cheat_caller_address(contract_address, OWNER());
 
