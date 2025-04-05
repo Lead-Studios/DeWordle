@@ -3,7 +3,7 @@ use dewordle::interfaces::{IDeWordleDispatcher, IDeWordleDispatcherTrait};
 use snforge_std::{
     CheatSpan, ContractClassTrait, DeclareResultTrait, cheat_block_timestamp, declare,
     start_cheat_caller_address, stop_cheat_caller_address, start_cheat_block_timestamp,
-    start_cheat_block_timestamp_global
+    start_cheat_block_timestamp_global, stop_cheat_block_timestamp
 };
 use starknet::{ContractAddress, get_block_timestamp};
 
@@ -550,3 +550,64 @@ fn test_update_end_of_day_no_change_before_day_ends() {
     assert(updated_timestamp == initial_timestamp, 'Timestamp should not change');
 }
 
+
+#[test]
+fn test_player_daily_streaks() {
+    let contract_address = deploy_contract();
+    let dewordle = IDeWordleDispatcher { contract_address };
+
+    start_cheat_caller_address(contract_address, OWNER());
+
+    // Define and set the daily word
+    let daily_word = "slept";
+    dewordle.set_daily_word(daily_word.clone());
+
+    // Play and win for the first day
+    dewordle.play();
+    match dewordle.submit_guess("slept") {
+        Option::None => (),
+        Option::Some(_) => panic!("ERROR"),
+    }
+
+    let (streak, max_streak) = dewordle.get_player_streaks(OWNER());
+
+    assert(streak == 1, 'Streak should be 1');
+    assert(max_streak == 1, 'Max streak should be 1');
+
+    //  Fast forward time by one day and win again
+    start_cheat_block_timestamp(contract_address, get_block_timestamp() + 86400);
+
+    start_cheat_caller_address(contract_address, OWNER());
+
+    dewordle.set_daily_word(daily_word.clone());
+    dewordle.play();
+    match dewordle.submit_guess("slept") {
+        Option::None => (),
+        Option::Some(_) => panic!("ERROR"),
+    }
+
+    let (streak, max_streak) = dewordle.get_player_streaks(OWNER());
+
+    assert(streak == 2, 'Streak should be 2');
+    assert(max_streak == 2, 'Max streak should be 2');
+
+    //  skip  days OKK!!
+    start_cheat_block_timestamp(contract_address, get_block_timestamp() + 111186400);
+
+    start_cheat_caller_address(contract_address, OWNER());
+
+    // Play and win again
+    dewordle.set_daily_word(daily_word.clone());
+    dewordle.play();
+    match dewordle.submit_guess("slept") {
+        Option::None => (),
+        Option::Some(_) => panic!("ERROR"),
+    }
+
+    let (streak, max_streak) = dewordle.get_player_streaks(OWNER());
+
+    assert(streak == 1, 'Streak after streak break be 1');
+    assert(max_streak == 2, 'max streak should remain 2');
+
+    stop_cheat_block_timestamp(contract_address);
+}
