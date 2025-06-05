@@ -10,6 +10,8 @@ import { ValidateWordResponseDto } from './dto/validate-word.dto';
 
 @Injectable()
 export class PuzzleService {
+  // private readonly puzzleRepository: Repository<Puzzle>
+
   constructor(
     @InjectRepository(Puzzle)
     private readonly puzzleRepository: Repository<Puzzle>,
@@ -19,35 +21,160 @@ export class PuzzleService {
   ) {}
 
   /**
-   * Create a new puzzle
+   * Create a new puzzle with enhanced validation (for admin upload endpoint)
+   * @param createPuzzleDto - Puzzle data
+   * @returns Created puzzle
+   */
+  async createPuzzleWithEnhancedValidation(createPuzzleDto: CreatePuzzleDto): Promise<Puzzle> {
+    // Check if puzzle already exists for this date
+    const existingPuzzle = await this.puzzleRepository.findOne({
+      where: { date: createPuzzleDto.date },
+    })
+
+    if (existingPuzzle) {
+      throw new ConflictException(`Puzzle already exists for date ${createPuzzleDto.date}`)
+    }
+
+    // Enhanced validation beyond basic DTO validation
+    this.validatePuzzleData(createPuzzleDto)
+
+    // Normalize data
+    const normalizedData = this.normalizePuzzleData(createPuzzleDto)
+
+    // Create new puzzle instance
+    const puzzle = this.puzzleRepository.create(normalizedData)
+
+    // Validate grid dimensions
+    if (!puzzle.validateGridDimensions()) {
+      throw new BadRequestException("Grid must be 6x8 with single character strings")
+    }
+
+    // Validate spangram is in valid words
+    if (!puzzle.validateSpangram()) {
+      throw new BadRequestException("Spangram must be included in validWords array")
+    }
+
+    // Save and return
+    return await this.puzzleRepository.save(puzzle)
+  }
+
+  /**
+   * Create a new puzzle (existing method)
    * @param createPuzzleDto - Puzzle data
    * @returns Created puzzle
    */
   async createPuzzle(createPuzzleDto: CreatePuzzleDto): Promise<Puzzle> {
     // Check if puzzle already exists for this date
     const existingPuzzle = await this.puzzleRepository.findOne({
-      where: { date: createPuzzleDto.date }
-    });
+      where: { date: createPuzzleDto.date },
+    })
 
     if (existingPuzzle) {
-      throw new ConflictException(`Puzzle already exists for date ${createPuzzleDto.date}`);
+      throw new ConflictException(`Puzzle already exists for date ${createPuzzleDto.date}`)
     }
 
     // Create new puzzle instance
-    const puzzle = this.puzzleRepository.create(createPuzzleDto);
+    const puzzle = this.puzzleRepository.create(createPuzzleDto)
 
     // Validate grid dimensions
     if (!puzzle.validateGridDimensions()) {
-      throw new BadRequestException('Grid must be 6x8 with single character strings');
+      throw new BadRequestException("Grid must be 6x8 with single character strings")
     }
 
     // Validate spangram is in valid words
     if (!puzzle.validateSpangram()) {
-      throw new BadRequestException('Spangram must be included in validWords array');
+      throw new BadRequestException("Spangram must be included in validWords array")
     }
 
     // Save and return
-    return await this.puzzleRepository.save(puzzle);
+    return await this.puzzleRepository.save(puzzle)
+  }
+
+  /**
+   * Enhanced validation for puzzle data
+   * @param createPuzzleDto - Puzzle data to validate
+   */
+  private validatePuzzleData(createPuzzleDto: CreatePuzzleDto): void {
+    const { validWords, spangram, grid, theme } = createPuzzleDto
+
+    // Validate theme is meaningful
+    if (theme.trim().length < 3) {
+      throw new BadRequestException("Theme must be at least 3 characters long")
+    }
+
+    // Ensure all words are unique (case-insensitive)
+    const upperWords = validWords.map((word) => word.toUpperCase())
+    const uniqueWords = new Set(upperWords)
+    if (uniqueWords.size !== validWords.length) {
+      throw new BadRequestException("All valid words must be unique")
+    }
+
+    // Ensure minimum word requirements
+    if (validWords.length < 4) {
+      throw new BadRequestException("Puzzle must have at least 4 valid words")
+    }
+
+    // Validate word lengths (reasonable range)
+    const invalidWords = validWords.filter((word) => word.length < 3 || word.length > 15)
+    if (invalidWords.length > 0) {
+      throw new BadRequestException(`Words must be between 3-15 characters: ${invalidWords.join(", ")}`)
+    }
+
+    // Ensure spangram is one of the longer words
+    const maxWordLength = Math.max(...validWords.map((word) => word.length))
+    if (spangram.length < Math.max(4, maxWordLength - 2)) {
+      throw new BadRequestException("Spangram should be one of the longest words (at least 4 letters)")
+    }
+
+    // Validate all words can be formed from grid letters
+    this.validateWordsAgainstGrid(validWords, grid)
+  }
+
+  /**
+   * Validate that all words can be formed from the grid
+   * @param words - Words to validate
+   * @param grid - Letter grid
+   */
+  private validateWordsAgainstGrid(words: string[], grid: string[][]): void {
+    const gridLetters = grid.flat().map((letter) => letter.toUpperCase())
+    const gridLetterCount = new Map<string, number>()
+
+    gridLetters.forEach((letter) => {
+      gridLetterCount.set(letter, (gridLetterCount.get(letter) || 0) + 1)
+    })
+
+    for (const word of words) {
+      const upperWord = word.toUpperCase()
+      const wordLetterCount = new Map<string, number>()
+
+      upperWord.split("").forEach((letter) => {
+        wordLetterCount.set(letter, (wordLetterCount.get(letter) || 0) + 1)
+      })
+
+      // Check if grid has enough of each letter for this word
+      for (const [letter, count] of wordLetterCount) {
+        if ((gridLetterCount.get(letter) || 0) < count) {
+          throw new BadRequestException(
+            `Word "${word}" cannot be formed from the grid - insufficient "${letter}" letters`,
+          )
+        }
+      }
+    }
+  }
+
+  /**
+   * Normalize puzzle data
+   * @param createPuzzleDto - Raw puzzle data
+   * @returns Normalized puzzle data
+   */
+  private normalizePuzzleData(createPuzzleDto: CreatePuzzleDto): CreatePuzzleDto {
+    return {
+      ...createPuzzleDto,
+      theme: createPuzzleDto.theme.trim(),
+      grid: createPuzzleDto.grid.map((row) => row.map((cell) => cell.toUpperCase())),
+      validWords: createPuzzleDto.validWords.map((word) => word.toUpperCase()),
+      spangram: createPuzzleDto.spangram.toUpperCase(),
+    }
   }
 
   /**
@@ -55,12 +182,12 @@ export class PuzzleService {
    * @returns Today's puzzle or null if not found
    */
   async getTodaysPuzzle(): Promise<Puzzle | null> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day
-    
+    const today = new Date()
+    today.setHours(0, 0, 0, 0) // Reset time to start of day
+
     return await this.puzzleRepository.findOne({
-      where: { date: today }
-    });
+      where: { date: today },
+    })
   }
 
   /**
@@ -69,18 +196,18 @@ export class PuzzleService {
    * @returns Puzzle for the specified date
    */
   async getPuzzleByDate(date: Date): Promise<Puzzle> {
-    const targetDate = new Date(date);
-    targetDate.setHours(0, 0, 0, 0); // Reset time to start of day
+    const targetDate = new Date(date)
+    targetDate.setHours(0, 0, 0, 0) // Reset time to start of day
 
     const puzzle = await this.puzzleRepository.findOne({
-      where: { date: targetDate }
-    });
+      where: { date: targetDate },
+    })
 
     if (!puzzle) {
-      throw new NotFoundException(`No puzzle found for date ${targetDate.toISOString().split('T')[0]}`);
+      throw new NotFoundException(`No puzzle found for date ${targetDate.toISOString().split("T")[0]}`)
     }
 
-    return puzzle;
+    return puzzle
   }
 
   /**
@@ -90,14 +217,14 @@ export class PuzzleService {
    */
   async getPuzzleById(id: string): Promise<Puzzle> {
     const puzzle = await this.puzzleRepository.findOne({
-      where: { id }
-    });
+      where: { id },
+    })
 
     if (!puzzle) {
-      throw new NotFoundException(`Puzzle with ID ${id} not found`);
+      throw new NotFoundException(`Puzzle with ID ${id} not found`)
     }
 
-    return puzzle;
+    return puzzle
   }
 
   /**
@@ -107,35 +234,35 @@ export class PuzzleService {
    * @returns Updated puzzle
    */
   async updatePuzzle(id: string, updatePuzzleDto: UpdatePuzzleDto): Promise<Puzzle> {
-    const puzzle = await this.getPuzzleById(id);
+    const puzzle = await this.getPuzzleById(id)
 
     // Update fields if provided
     if (updatePuzzleDto.theme) {
-      puzzle.theme = updatePuzzleDto.theme;
+      puzzle.theme = updatePuzzleDto.theme
     }
-    
+
     if (updatePuzzleDto.grid) {
-      puzzle.grid = updatePuzzleDto.grid;
+      puzzle.grid = updatePuzzleDto.grid
       // Validate new grid dimensions
       if (!puzzle.validateGridDimensions()) {
-        throw new BadRequestException('Grid must be 6x8 with single character strings');
+        throw new BadRequestException("Grid must be 6x8 with single character strings")
       }
     }
-    
+
     if (updatePuzzleDto.validWords) {
-      puzzle.validWords = updatePuzzleDto.validWords;
+      puzzle.validWords = updatePuzzleDto.validWords
     }
-    
+
     if (updatePuzzleDto.spangram) {
-      puzzle.spangram = updatePuzzleDto.spangram;
+      puzzle.spangram = updatePuzzleDto.spangram
     }
 
     // Validate spangram is still in valid words after update
     if (!puzzle.validateSpangram()) {
-      throw new BadRequestException('Spangram must be included in validWords array');
+      throw new BadRequestException("Spangram must be included in validWords array")
     }
 
-    return await this.puzzleRepository.save(puzzle);
+    return await this.puzzleRepository.save(puzzle)
   }
 
   /**
@@ -144,14 +271,14 @@ export class PuzzleService {
    * @returns Deletion result
    */
   async deletePuzzle(id: string): Promise<{ deleted: boolean; message: string }> {
-    const puzzle = await this.getPuzzleById(id);
-    
-    await this.puzzleRepository.remove(puzzle);
-    
+    const puzzle = await this.getPuzzleById(id)
+
+    await this.puzzleRepository.remove(puzzle)
+
     return {
       deleted: true,
-      message: `Puzzle for ${puzzle.date.toISOString().split('T')[0]} has been deleted`
-    };
+      message: `Puzzle for ${puzzle.date.toISOString().split("T")[0]} has been deleted`,
+    }
   }
 
   /**
@@ -160,14 +287,14 @@ export class PuzzleService {
    * @param offset - Number of puzzles to skip
    * @returns Array of puzzles
    */
-  async getAllPuzzles(limit: number = 10, offset: number = 0): Promise<{ puzzles: Puzzle[]; total: number }> {
+  async getAllPuzzles(limit = 10, offset = 0): Promise<{ puzzles: Puzzle[]; total: number }> {
     const [puzzles, total] = await this.puzzleRepository.findAndCount({
-      order: { date: 'DESC' },
+      order: { date: "DESC" },
       take: limit,
-      skip: offset
-    });
+      skip: offset,
+    })
 
-    return { puzzles, total };
+    return { puzzles, total }
   }
 
   /**
@@ -176,38 +303,35 @@ export class PuzzleService {
    * @param foundWords - Words found by player
    * @returns Validation result
    */
-  async validateSolution(puzzleId: string, foundWords: string[]): Promise<{
-    isComplete: boolean;
-    validWords: string[];
-    invalidWords: string[];
-    missingWords: string[];
-    foundSpangram: boolean;
-  }> {
-    const puzzle = await this.getPuzzleById(puzzleId);
-    
-    const validFoundWords = foundWords.filter(word => 
-      puzzle.validWords.includes(word.toUpperCase())
-    );
-    
-    const invalidWords = foundWords.filter(word => 
-      !puzzle.validWords.includes(word.toUpperCase())
-    );
-    
-    const missingWords = puzzle.validWords.filter(word => 
-      !foundWords.map(w => w.toUpperCase()).includes(word)
-    );
-    
-    const foundSpangram = foundWords.map(w => w.toUpperCase()).includes(puzzle.spangram.toUpperCase());
-    
-    const isComplete = missingWords.length === 0 && foundSpangram;
+  async validateSolution(
+    puzzleId: string,
+    foundWords: string[],
+  ): Promise<{
+    isComplete: boolean
+    validWords: string[]
+    invalidWords: string[]
+    missingWords: string[]
+    foundSpangram: boolean
+  } {
+    const puzzle = await this.getPuzzleById(puzzleId)
+
+    const validFoundWords = foundWords.filter((word) => puzzle.validWords.includes(word.toUpperCase()))
+
+    const invalidWords = foundWords.filter((word) => !puzzle.validWords.includes(word.toUpperCase()))
+
+    const missingWords = puzzle.validWords.filter((word) => !foundWords.map((w) => w.toUpperCase()).includes(word))
+
+    const foundSpangram = foundWords.map((w) => w.toUpperCase()).includes(puzzle.spangram.toUpperCase())
+
+    const isComplete = missingWords.length === 0 && foundSpangram
 
     return {
       isComplete,
       validWords: validFoundWords,
       invalidWords,
       missingWords,
-      foundSpangram
-    };
+      foundSpangram,
+    }
   }
 
   async validateWord(word: string, userId: string): Promise<ValidateWordResponseDto> {

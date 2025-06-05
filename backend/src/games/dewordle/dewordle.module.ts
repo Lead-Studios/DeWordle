@@ -9,7 +9,7 @@ import { DewordleService } from './dewordle.service';
 import { GamesService } from '../games.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Game } from '../entities/game.entity';
-import { WordsService } from './words/words.service';
+import { Word } from './words/entities/word.entity';
 
 @Module({
   imports: [
@@ -17,15 +17,14 @@ import { WordsService } from './words/words.service';
     ResultModule,
     WordsModule,
     forwardRef(() => GamesModule),
-    TypeOrmModule.forFeature([Game]),
+    TypeOrmModule.forFeature([Game, Word]),
   ],
   controllers: [DewordleController],
   providers: [
     DewordleService,
     DewordleStateService,
     GamesService,
-    WordsService,
   ],
-  exports: [DewordleService, DewordleStateService, GamesService, WordsService],
+  exports: [DewordleService, DewordleStateService, GamesService],
 })
 export class DewordleModule {}

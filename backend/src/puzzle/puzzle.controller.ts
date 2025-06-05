@@ -1,14 +1,17 @@
 import {
   Controller,
-  Get,
   Post,
+  UseGuards,
+  HttpStatus,
+  HttpCode,
+  ValidationPipe,
+  UsePipes,
+  Get,
+  Param,
+  Query,
   Put,
   Delete,
   Body,
-  Param,
-  Query,
-  HttpStatus,
-  UseGuards,
   ParseUUIDPipe,
   ParseIntPipe,
   Req,
@@ -36,7 +39,7 @@ import { JwtAuthGuard } from 'security/guards/jwt-auth.guard';
 export class PuzzleController {
   constructor(private readonly puzzleService: PuzzleService) {}
 
-  @Get('today')
+  @Get("today")
   @ApiOperation({ summary: "Get today's puzzle" })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -45,25 +48,20 @@ export class PuzzleController {
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'No puzzle available for today',
+    description: "No puzzle available for today",
   })
   async getTodaysPuzzle(): Promise<Puzzle | { message: string }> {
-    const puzzle = await this.puzzleService.getTodaysPuzzle();
+    const puzzle = await this.puzzleService.getTodaysPuzzle()
 
     if (!puzzle) {
-      return { message: 'No puzzle available for today' };
+      return { message: "No puzzle available for today" }
     }
 
-    return puzzle;
+    return puzzle
   }
 
-  @Get(':date')
+  @Get(":date")
   @ApiOperation({ summary: 'Get puzzle by specific date' })
-  @ApiParam({
-    name: 'date',
-    description: 'Date in YYYY-MM-DD format',
-    example: '2024-01-15',
-  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Puzzle retrieved successfully',
@@ -93,7 +91,6 @@ export class PuzzleController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid puzzle data',
   })
-
   @UseGuards(AdminJwtAuthGuard) 
   @ApiBearerAuth()
   async createPuzzle(
@@ -102,33 +99,32 @@ export class PuzzleController {
     return await this.puzzleService.createPuzzle(createPuzzleDto);
   }
 
-  @Put(':id')
-  @ApiOperation({ summary: 'Update existing puzzle (Admin only)' })
-  @ApiParam({ name: 'id', description: 'Puzzle UUID' })
+  @Put(":id")
+  @ApiOperation({ summary: "Update existing puzzle (Admin only)" })
+  @ApiParam({ name: "id", description: "Puzzle UUID" })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Puzzle updated successfully',
+    description: "Puzzle updated successfully",
     type: PuzzleResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'Puzzle not found',
+    description: "Puzzle not found",
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid update data',
+    description: "Invalid update data",
   })
-
-  @UseGuards(AdminJwtAuthGuard) 
+  @UseGuards(AdminJwtAuthGuard)
   @ApiBearerAuth()
   async updatePuzzle(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePuzzleDto: UpdatePuzzleDto,
   ): Promise<Puzzle> {
-    return await this.puzzleService.updatePuzzle(id, updatePuzzleDto);
+    return await this.puzzleService.updatePuzzle(id, updatePuzzleDto)
   }
 
-  @Delete(':id')
+  @Delete(":id")
   @ApiOperation({ summary: 'Delete puzzle (Admin only)' })
   @ApiParam({ name: 'id', description: 'Puzzle UUID' })
   @ApiResponse({
@@ -139,7 +135,6 @@ export class PuzzleController {
     status: HttpStatus.NOT_FOUND,
     description: 'Puzzle not found',
   })
-
   @UseGuards(AdminJwtAuthGuard) 
   @ApiBearerAuth()
   async deletePuzzle(
@@ -149,55 +144,164 @@ export class PuzzleController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all puzzles with pagination (Admin only)' })
+  @ApiOperation({ summary: "Get all puzzles with pagination (Admin only)" })
   @ApiQuery({
-    name: 'limit',
+    name: "limit",
     required: false,
-    description: 'Number of puzzles to return',
+    description: "Number of puzzles to return",
     example: 10,
   })
   @ApiQuery({
-    name: 'offset',
+    name: "offset",
     required: false,
-    description: 'Number of puzzles to skip',
+    description: "Number of puzzles to skip",
     example: 0,
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Puzzles retrieved successfully',
+    description: "Puzzles retrieved successfully",
   })
-
-  @UseGuards(AdminJwtAuthGuard) 
+  @UseGuards(AdminJwtAuthGuard)
   @ApiBearerAuth()
   async getAllPuzzles(
     @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
     @Query('offset', new ParseIntPipe({ optional: true })) offset: number = 0,
   ): Promise<{ puzzles: Puzzle[]; total: number }> {
-    return await this.puzzleService.getAllPuzzles(limit, offset);
+    return await this.puzzleService.getAllPuzzles(limit, offset)
   }
 
-  @Post(':id/validate')
-  @ApiOperation({ summary: 'Validate puzzle solution' })
-  @ApiParam({ name: 'id', description: 'Puzzle UUID' })
+  @Post(":id/validate")
+  @ApiOperation({ summary: "Validate puzzle solution" })
+  @ApiParam({ name: "id", description: "Puzzle UUID" })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Solution validated successfully',
+    description: "Solution validated successfully",
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'Puzzle not found',
+    description: "Puzzle not found",
   })
   async validateSolution(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: { foundWords: string[] },
   ): Promise<{
-    isComplete: boolean;
-    validWords: string[];
-    invalidWords: string[];
-    missingWords: string[];
-    foundSpangram: boolean;
+    isComplete: boolean
+    validWords: string[]
+    invalidWords: string[]
+    missingWords: string[]
+    foundSpangram: boolean
   }> {
-    return await this.puzzleService.validateSolution(id, body.foundWords);
+    return await this.puzzleService.validateSolution(id, body.foundWords)
+  }
+}
+
+@ApiTags("Admin Puzzles")
+@Controller("admin/puzzles")
+@UseGuards(AdminJwtAuthGuard)
+@ApiBearerAuth()
+export class AdminPuzzleController {
+  constructor(private readonly puzzleService: PuzzleService) {}
+
+  @Post("upload")
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: "Upload a new puzzle (Admin only)",
+    description: "Creates a new puzzle with comprehensive validation of grid, words, and spangram",
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: "The puzzle has been successfully created.",
+    schema: {
+      example: {
+        id: "uuid-string",
+        date: "2024-01-15",
+        theme: "Animals in the Wild",
+        grid: [
+          ["T", "I", "G", "E", "R", "S", "H", "A"],
+          ["L", "I", "O", "N", "M", "O", "N", "K"],
+        ],
+        validWords: ["TIGER", "LION", "ELEPHANT"],
+        spangram: "ELEPHANT",
+        createdAt: "2024-01-15T10:00:00Z",
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: "Validation error or invalid puzzle data.",
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: "Unauthorized access - valid admin token required.",
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: "Puzzle already exists for the specified date.",
+  })
+  async uploadPuzzle(createPuzzleDto: CreatePuzzleDto) {
+    const puzzle = await this.puzzleService.createPuzzleWithEnhancedValidation(createPuzzleDto)
+
+    // Return the created puzzle without internal metadata
+    return {
+      id: puzzle.id,
+      date: puzzle.date,
+      theme: puzzle.theme,
+      grid: puzzle.grid,
+      validWords: puzzle.validWords,
+      spangram: puzzle.spangram,
+      createdAt: puzzle.createdAt,
+    }
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: "Get all puzzles (Admin only)",
+    description: "Retrieves all puzzles ordered by date (newest first)",
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "List of all puzzles retrieved successfully.",
+  })
+  async getAllPuzzles() {
+    const result = await this.puzzleService.getAllPuzzles(100, 0)
+
+    return result.puzzles.map((puzzle) => ({
+      id: puzzle.id,
+      date: puzzle.date,
+      theme: puzzle.theme,
+      wordCount: puzzle.validWords.length,
+      createdAt: puzzle.createdAt,
+    }))
+  }
+
+  @Get(":id")
+  @ApiOperation({ 
+    summary: 'Get puzzle by ID (Admin only)',
+    description: 'Retrieves a specific puzzle with all details'
+  })
+  @ApiParam({ name: 'id', description: 'Puzzle UUID' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Puzzle retrieved successfully.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Puzzle not found.',
+  })
+  async getPuzzleById(@Param('id', ParseUUIDPipe) id: string) {
+    const puzzle = await this.puzzleService.getPuzzleById(id);
+    
+    return {
+      id: puzzle.id,
+      date: puzzle.date,
+      theme: puzzle.theme,
+      grid: puzzle.grid,
+      validWords: puzzle.validWords,
+      spangram: puzzle.spangram,
+      createdAt: puzzle.createdAt,
+      updatedAt: puzzle.updatedAt,
+    };
   }
 
   @Post('validate-word')
