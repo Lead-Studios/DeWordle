@@ -140,6 +140,7 @@ import { PoolPressureService } from './database/pool-pressure.service';
     AuthModule,
     UserModule,
     GamesModule,
+    WordSuggestionsModule,
     WordsModule,
     WordCacheModule,
     MetricsModule,
