@@ -18,6 +18,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { MetricsModule } from './dewordle/metrics/metrics.module';
 import { MetricsController } from './dewordle/metrics/metrics.controller';
 import { IndexerModule } from './indexer/indexer.module';
+import { MatchmakingModule } from './matchmaking/matchmaking.module';
 import { DictionaryModule } from './word/dictionary.module';
 import { ReadApiController } from './common/read-api.controller';
 import { DeprecationController } from './common/deprecation.controller';
@@ -28,6 +29,7 @@ import { CacheLoggerService } from './common/cache-logger.service';
 import { VersioningModule } from './common/versioning.module';
 import { JobModule } from './common/job.module';
 import { DigestModule } from './digest/digest.module';
+import { AdminModule } from './admin/admin.module';
 import { PoolPressureService } from './database/pool-pressure.service';
 
 @Module({
@@ -145,6 +147,7 @@ import { PoolPressureService } from './database/pool-pressure.service';
     VersioningModule,
     JobModule,
     AdminModule,
+    MatchmakingModule,
   ],
   controllers: [
     AppController,
