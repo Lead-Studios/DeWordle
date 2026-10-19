@@ -66,3 +66,67 @@ export function calculateLetterStatuses(
 export function isGameWon(statuses: ('correct' | 'present' | 'absent')[]): boolean {
   return statuses.every((s) => s === 'correct');
 }
+
+export type LetterStatus = 'correct' | 'present' | 'absent';
+
+export interface EvaluatedGuess {
+  guess: string;
+  statuses: LetterStatus[];
+}
+
+function ordinal(n: number): string {
+  const suffix = n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th';
+  return `${n}${suffix}`;
+}
+
+/**
+ * Hard mode (#1426): a guess must keep every letter previously confirmed in its
+ * correct position, and must include every letter previously revealed as
+ * present (respecting how many times it was revealed in a single guess).
+ */
+export function validateHardModeGuess(
+  guess: string,
+  previousGuesses: EvaluatedGuess[],
+): ValidationResult {
+  const letters = guess.trim().toUpperCase().split('');
+
+  for (const { guess: prior, statuses } of previousGuesses) {
+    const priorLetters = prior.toUpperCase().split('');
+    for (let i = 0; i < statuses.length; i++) {
+      if (statuses[i] === 'correct' && letters[i] !== priorLetters[i]) {
+        return {
+          isValid: false,
+          error: `Hard mode: ${ordinal(i + 1)} letter must be ${priorLetters[i]}`,
+        };
+      }
+    }
+  }
+
+  const required = new Map<string, number>();
+  for (const { guess: prior, statuses } of previousGuesses) {
+    const counts = new Map<string, number>();
+    prior.toUpperCase().split('').forEach((letter, i) => {
+      if (statuses[i] === 'correct' || statuses[i] === 'present') {
+        counts.set(letter, (counts.get(letter) ?? 0) + 1);
+      }
+    });
+    for (const [letter, count] of counts) {
+      required.set(letter, Math.max(required.get(letter) ?? 0, count));
+    }
+  }
+
+  for (const [letter, count] of required) {
+    const used = letters.filter((l) => l === letter).length;
+    if (used < count) {
+      return {
+        isValid: false,
+        error:
+          count > 1
+            ? `Hard mode: guess must contain ${letter} ${count} times`
+            : `Hard mode: guess must contain ${letter}`,
+      };
+    }
+  }
+
+  return { isValid: true };
+}

@@ -85,6 +85,104 @@ function buildShareText(result: SessionResultData, rows: GuessRow[]): string {
   return `DeWordle ${kindLabel}${dateStr}\n${guessLine} \u2014 Streak: ${result.streak}\n${grid}`;
 }
 
+export interface LetterFrequency {
+  letter: string;
+  count: number;
+}
+
+/** Letter counts of the target word, most frequent first, ties alphabetical. */
+export function computeLetterFrequencies(word: string): LetterFrequency[] {
+  const counts = new Map<string, number>();
+  for (const letter of word.toUpperCase().replace(/[^A-Z]/g, "")) {
+    counts.set(letter, (counts.get(letter) ?? 0) + 1);
+  }
+  return Array.from(counts, ([letter, count]) => ({ letter, count })).sort(
+    (a, b) => b.count - a.count || a.letter.localeCompare(b.letter),
+  );
+}
+
+const FREQ_BAR_HEIGHT = 18;
+const FREQ_BAR_GAP = 6;
+const FREQ_LABEL_WIDTH = 20;
+const FREQ_COUNT_WIDTH = 24;
+const FREQ_CHART_WIDTH = 240;
+
+function LetterFrequencyChart({ word }: { word: string }) {
+  const frequencies = computeLetterFrequencies(word);
+  if (frequencies.length === 0) return null;
+
+  const maxCount = Math.max(...frequencies.map((f) => f.count));
+  const trackWidth = FREQ_CHART_WIDTH - FREQ_LABEL_WIDTH - FREQ_COUNT_WIDTH;
+  const height = frequencies.length * (FREQ_BAR_HEIGHT + FREQ_BAR_GAP) - FREQ_BAR_GAP;
+
+  return (
+    <section aria-labelledby="letter-frequency-heading" className="flex flex-col gap-2">
+      <h3
+        id="letter-frequency-heading"
+        className="text-xs font-semibold uppercase tracking-wider text-purple-300"
+      >
+        Letter frequency
+      </h3>
+      <svg
+        role="img"
+        aria-label={`Letter frequency of the target word: ${frequencies
+          .map((f) => `${f.letter} ${f.count}`)
+          .join(", ")}`}
+        viewBox={`0 0 ${FREQ_CHART_WIDTH} ${height}`}
+        width="100%"
+        className="max-w-full"
+      >
+        {frequencies.map(({ letter, count }, i) => {
+          const y = i * (FREQ_BAR_HEIGHT + FREQ_BAR_GAP);
+          const barWidth = Math.max((count / maxCount) * trackWidth, 4);
+          const textY = y + FREQ_BAR_HEIGHT / 2;
+          return (
+            <g key={letter} data-testid="letter-frequency-bar" data-letter={letter} data-count={count}>
+              <text
+                x={0}
+                y={textY}
+                dominantBaseline="central"
+                fontSize={12}
+                fontWeight={700}
+                fill="currentColor"
+              >
+                {letter}
+              </text>
+              <rect
+                x={FREQ_LABEL_WIDTH}
+                y={y}
+                width={trackWidth}
+                height={FREQ_BAR_HEIGHT}
+                rx={4}
+                fill="currentColor"
+                opacity={0.1}
+              />
+              <rect
+                x={FREQ_LABEL_WIDTH}
+                y={y}
+                width={barWidth}
+                height={FREQ_BAR_HEIGHT}
+                rx={4}
+                fill="var(--primary)"
+              />
+              <text
+                x={FREQ_CHART_WIDTH}
+                y={textY}
+                dominantBaseline="central"
+                textAnchor="end"
+                fontSize={12}
+                fill="currentColor"
+              >
+                {count}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </section>
+  );
+}
+
 function OutcomeBadge({ won, kind }: { won: boolean; kind: SessionKind }) {
   if (kind === "interrupted") {
     return (
@@ -180,6 +278,8 @@ export function SessionResultCard({ result, onShare }: SessionResultCardProps) {
           ))}
         </div>
       )}
+
+      {!isInterrupted && !won && <LetterFrequencyChart word={word} />}
 
       {txHash && (
         <p className="text-center text-xs text-gray-500 truncate">

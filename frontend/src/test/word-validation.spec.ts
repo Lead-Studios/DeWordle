@@ -3,6 +3,8 @@ import {
   validateGuess,
   calculateLetterStatuses,
   isGameWon,
+  validateHardModeGuess,
+  type LetterStatus,
 } from '../lib/word-validation';
 
 describe('validateGuess', () => {
@@ -120,5 +122,41 @@ describe('isGameWon', () => {
 
   it('returns true for empty array', () => {
     expect(isGameWon([])).toBe(true);
+  });
+});
+
+describe('validateHardModeGuess', () => {
+  const history = [
+    { guess: 'CRANE', statuses: ['absent', 'correct', 'present', 'absent', 'absent'] as LetterStatus[] },
+  ];
+
+  it('accepts a guess that reuses all revealed hints', () => {
+    expect(validateHardModeGuess('BRASH', history).isValid).toBe(true);
+  });
+
+  it('rejects a guess that moves a correct-position letter', () => {
+    const result = validateHardModeGuess('ABORT', history);
+    expect(result.isValid).toBe(false);
+    expect(result.error).toBe('Hard mode: 2nd letter must be R');
+  });
+
+  it('rejects a guess missing a present letter', () => {
+    const result = validateHardModeGuess('TRUST', history);
+    expect(result.isValid).toBe(false);
+    expect(result.error).toBe('Hard mode: guess must contain A');
+  });
+
+  it('requires duplicate revealed letters to be repeated', () => {
+    const dupHistory = [
+      { guess: 'EERIE', statuses: ['present', 'present', 'absent', 'absent', 'absent'] as LetterStatus[] },
+    ];
+    expect(validateHardModeGuess('STEAL', dupHistory).error).toBe(
+      'Hard mode: guess must contain E 2 times',
+    );
+    expect(validateHardModeGuess('SHEEP', dupHistory).isValid).toBe(true);
+  });
+
+  it('accepts anything with no history', () => {
+    expect(validateHardModeGuess('ZZZZZ', []).isValid).toBe(true);
   });
 });

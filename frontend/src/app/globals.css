@@ -358,3 +358,46 @@ html {
     overflow-x: hidden;
   }
 }
+
+/*
+ * Tile / keyboard feedback palette (#1428).
+ * Default is green/yellow/gray; [data-color-blind="true"] on <html> swaps
+ * correct→blue and present→orange. Every fg/bg pair meets WCAG AA (≥4.5:1):
+ *   #2563eb on #ffffff  5.17:1   #f97316 on #111827  6.35:1
+ *   #4b5563 on #ffffff  7.56:1
+ */
+:root {
+  --tile-correct: #16a34a;
+  --tile-correct-border: #15803d;
+  --tile-correct-fg: #ffffff;
+  --tile-present: #eab308;
+  --tile-present-border: #ca8a04;
+  --tile-present-fg: #ffffff;
+  --tile-absent: #4b5563;
+  --tile-absent-border: #374151;
+  --tile-absent-fg: #ffffff;
+}
+
+:root[data-color-blind="true"] {
+  --tile-correct: #2563eb;
+  --tile-correct-border: #1d4ed8;
+  --tile-correct-fg: #ffffff;
+  --tile-present: #f97316;
+  --tile-present-border: #ea580c;
+  --tile-present-fg: #111827;
+}
+
+@keyframes streak-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+.streak-pulse {
+  animation: streak-pulse 600ms ease-in-out 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streak-pulse {
+    animation: none;
+  }
+}

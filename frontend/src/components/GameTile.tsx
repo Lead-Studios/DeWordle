@@ -10,9 +10,9 @@ interface GameTileProps {
 
 const STATE_CLASSES: Record<TileState, string> = {
   empty: "border-gray-300 bg-white text-gray-900",
-  correct: "border-green-600 bg-green-600 text-white",
-  present: "border-yellow-500 bg-yellow-500 text-white",
-  absent: "border-gray-600 bg-gray-600 text-white",
+  correct: "border-[var(--tile-correct-border)] bg-[var(--tile-correct)] text-[var(--tile-correct-fg)]",
+  present: "border-[var(--tile-present-border)] bg-[var(--tile-present)] text-[var(--tile-present-fg)]",
+  absent: "border-[var(--tile-absent-border)] bg-[var(--tile-absent)] text-[var(--tile-absent-fg)]",
 };
 
 const GameTile: React.FC<GameTileProps> = ({

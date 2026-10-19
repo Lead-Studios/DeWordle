@@ -44,9 +44,9 @@ describe('VirtualKeyboard', () => {
     const statuses: Record<string, KeyStatus> = { Q: 'correct', W: 'present', E: 'absent' };
     render(<VirtualKeyboard onKeyPress={vi.fn()} onEnter={vi.fn()} onBackspace={vi.fn()} keyStatuses={statuses} />);
     const qButton = screen.getByRole('button', { name: /letter q/i });
-    expect(qButton.className).toContain('bg-green-600');
+    expect(qButton.className).toContain('bg-[var(--tile-correct)]');
     const wButton = screen.getByRole('button', { name: /letter w/i });
-    expect(wButton.className).toContain('bg-yellow-500');
+    expect(wButton.className).toContain('bg-[var(--tile-present)]');
   });
 
   it('disables all keys when disabled prop is true', () => {

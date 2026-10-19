@@ -11,6 +11,8 @@ export function SettingsPanel() {
     setSoundEffects,
     showDifficultyBadge,
     setShowDifficultyBadge,
+    hardMode,
+    setHardMode,
   } = useSettings();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -102,6 +104,37 @@ export function SettingsPanel() {
         </button>
       </div>
 
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col">
+          <label
+            htmlFor="hardmode-toggle"
+            className="cursor-pointer select-none text-sm font-medium text-gray-300"
+          >
+            Hard mode
+          </label>
+          <span id="hardmode-description" className="text-xs text-gray-500">
+            Revealed hints must be used in later guesses
+          </span>
+        </div>
+        <button
+          id="hardmode-toggle"
+          role="switch"
+          aria-checked={hardMode}
+          aria-label="Toggle hard mode"
+          aria-describedby="hardmode-description"
+          onClick={() => setHardMode(!hardMode)}
+          className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white/60 ${
+            hardMode ? "bg-[#4b5fff]" : "bg-dark-500"
+          }`}
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+              hardMode ? "translate-x-6" : "translate-x-1"
+            }`}
+          />
+        </button>
+      </div>
+
       <div className="border-t border-white/10 pt-3 flex flex-col gap-2">
         <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
           Data Management
@@ -158,7 +191,7 @@ export function ColorBlindOverlay({ state }: { state: TileState }) {
     <span
       aria-hidden="true"
       className="absolute inset-0 flex items-center justify-center text-lg font-bold opacity-80"
-      style={{ color: state === "correct" ? "#22c55e" : state === "present" ? "#eab308" : "#6b7280" }}
+      style={{ color: `var(--tile-${state})` }}
     >
       {COLOR_BLIND_SYMBOLS[state]}
     </span>
