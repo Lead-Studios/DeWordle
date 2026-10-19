@@ -1,7 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Word } from '../../entities/word.entity';
+import { WordCacheService } from './word-cache.service';
 
 @Injectable()
 export class WordValidationService {
@@ -10,6 +11,8 @@ export class WordValidationService {
   constructor(
     @InjectRepository(Word)
     private readonly wordRepository: Repository<Word>,
+    @Optional()
+    private readonly wordCache?: WordCacheService,
   ) {}
 
   /**
@@ -23,6 +26,16 @@ export class WordValidationService {
     }
 
     const normalizedWord = word.toLowerCase().trim();
+
+    // Serve from the in-memory dictionary cache (sub-millisecond O(1)
+    // lookup) when it is warm; otherwise fall back to the database.
+    if (this.wordCache?.isLoaded()) {
+      const isValid = this.wordCache.has(normalizedWord);
+      this.logger.debug(
+        `Word validation for "${normalizedWord}" (cache): ${isValid}`,
+      );
+      return isValid;
+    }
 
     try {
       const foundWord = await this.wordRepository.findOne({
@@ -52,6 +65,14 @@ export class WordValidationService {
     const results: Record<string, boolean> = {};
 
     const normalizedWords = words.map((word) => word.toLowerCase().trim());
+
+    // Batch validation also short-circuits through the warm cache.
+    if (this.wordCache?.isLoaded()) {
+      for (let i = 0; i < words.length; i++) {
+        results[words[i]] = this.wordCache.has(normalizedWords[i]);
+      }
+      return results;
+    }
 
     try {
       const foundWords = await this.wordRepository.find({
