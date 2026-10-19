@@ -8,9 +8,11 @@ import {
   NotFoundException,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { WordsService } from './words.service';
 import {
+  ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -19,6 +21,9 @@ import {
 } from '@nestjs/swagger';
 import { EnrichedWord } from '../../utils/dictionary.helper';
 import { WordScheduler } from './word.scheduler';
+import { JwtAuthGuard } from '../../auth/guards/jwt-guard.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { Roles } from '../../auth/decorators/roles.decorators';
 import { CreateWordDto } from './dto/create-word.dto';
 import { ValidateWordDto } from './dto/validate-word.dto';
 import { WordResponseDto } from './dto/word-response.dto';
@@ -106,6 +111,9 @@ export class WordsController {
   }
 
   @Post('daily/trigger')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Trigger manual daily word generation',
     description:
@@ -121,6 +129,32 @@ export class WordsController {
   async triggerManual() {
     await this.wordScheduler.ensureTodayWord();
     return { status: 'Triggered' };
+  }
+
+  @Post('daily/rotate')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Force a new daily word (admin only)',
+    description:
+      'Immediately rotates the daily word for the configured timezone. The previous word is retired and a fresh unused word is selected. Rotation telemetry records only a word hash.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Rotation executed successfully.',
+    schema: {
+      example: {
+        status: 'Rotated',
+        timezone: 'UTC',
+        puzzleDate: '2026-01-01',
+        wordHash: '9f86d081884c7d65',
+        rotatedAt: '2026-01-01T00:00:03.120Z',
+      },
+    },
+  })
+  async rotateDailyWord() {
+    return this.wordScheduler.rotateNow();
   }
 
   @Get('daily/health')
