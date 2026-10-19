@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ShareResultCard, GuessRow } from "./ShareResultCard";
+import { WordDefinitionTooltip } from "./WordDefinitionTooltip";
 
 export type SessionKind = "daily" | "practice" | "interrupted";
 
@@ -134,9 +135,13 @@ export function SessionResultCard({ result, onShare }: SessionResultCardProps) {
             {KIND_LABEL[kind]}
             {date && <span className="ml-2 text-gray-400 normal-case tracking-normal">{date}</span>}
           </span>
-          <span className="text-2xl font-bold tracking-widest">
-            {isInterrupted ? "\u2014\u2014\u2014" : word.toUpperCase()}
-          </span>
+          {isInterrupted ? (
+            <span className="text-2xl font-bold tracking-widest">
+              {"\u2014\u2014\u2014"}
+            </span>
+          ) : (
+            <WordDefinitionTooltip word={word} />
+          )}
         </div>
         <OutcomeBadge won={won} kind={kind} />
       </div>
