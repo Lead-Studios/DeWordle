@@ -7,6 +7,7 @@ import Header from "@/components/header";
 import { StellarWalletProvider } from "@/providers/stellar-wallet-provider";
 import { SettingsProvider } from "@/providers/settings-provider";
 import { AchievementCelebration } from "@/components/AchievementCelebration";
+import { PwaInstallBanner } from "@/components/PwaInstallBanner";
 import { ZoomRoot } from "@/components/ZoomRoot";
 import { NO_FLASH_SCRIPT } from "@/lib/theme";
 import { OnboardingProvider } from "@/providers/onboarding-provider";
@@ -50,6 +51,7 @@ const clashDisplay = localFont({
 export const metadata: Metadata = {
   title: "DeWordle",
   description: "Soroban-native word game migration foundation",
+  manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {
@@ -90,6 +92,7 @@ export default function RootLayout({
               <AuthProvider>
                 <Header />
                 <AchievementCelebration />
+                <PwaInstallBanner />
                 <main
                   id="main-content"
                   tabIndex={-1}
