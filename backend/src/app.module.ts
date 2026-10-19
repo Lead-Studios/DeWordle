@@ -14,6 +14,7 @@ import { GamesModule } from './games/games.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { GameSessionsModule } from './game-sessions/game-sessions.module';
 import { WordsModule } from './dewordle/words/words.module';
+import { WordCacheModule } from './dewordle/words/word-cache.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MetricsModule } from './dewordle/metrics/metrics.module';
 import { MetricsController } from './dewordle/metrics/metrics.controller';
@@ -28,6 +29,7 @@ import { CacheLoggerService } from './common/cache-logger.service';
 import { VersioningModule } from './common/versioning.module';
 import { JobModule } from './common/job.module';
 import { DigestModule } from './digest/digest.module';
+import { AdminModule } from './admin/admin.module';
 import { PoolPressureService } from './database/pool-pressure.service';
 
 @Module({
@@ -138,6 +140,7 @@ import { PoolPressureService } from './database/pool-pressure.service';
     UserModule,
     GamesModule,
     WordsModule,
+    WordCacheModule,
     MetricsModule,
     IndexerModule,
     DictionaryModule,
