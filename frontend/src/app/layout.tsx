@@ -6,6 +6,7 @@ import { AuthProvider } from "../../context/AuthContext";
 import Header from "@/components/header";
 import { StellarWalletProvider } from "@/providers/stellar-wallet-provider";
 import { SettingsProvider } from "@/providers/settings-provider";
+import { ToastViewport } from "@/components/ToastViewport";
 import { AchievementCelebration } from "@/components/AchievementCelebration";
 import { PwaInstallBanner } from "@/components/PwaInstallBanner";
 import { ZoomRoot } from "@/components/ZoomRoot";
@@ -93,6 +94,7 @@ export default function RootLayout({
                 <Header />
                 <AchievementCelebration />
                 <PwaInstallBanner />
+                <ToastViewport />
                 <main
                   id="main-content"
                   tabIndex={-1}

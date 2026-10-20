@@ -42,21 +42,21 @@ describe('VirtualKeyboard', () => {
     const keyStatuses: Record<string, KeyStatus> = { A: 'correct' };
     render(<VirtualKeyboard onKeyPress={vi.fn()} onEnter={vi.fn()} onBackspace={vi.fn()} keyStatuses={keyStatuses} />);
     const key = screen.getByRole('button', { name: /Letter A/i });
-    expect(key.className).toContain('bg-green-600');
+    expect(key.className).toContain('bg-[var(--tile-correct)]');
   });
 
   it('applies yellow background for present status', () => {
     const keyStatuses: Record<string, KeyStatus> = { B: 'present' };
     render(<VirtualKeyboard onKeyPress={vi.fn()} onEnter={vi.fn()} onBackspace={vi.fn()} keyStatuses={keyStatuses} />);
     const key = screen.getByRole('button', { name: /Letter B/i });
-    expect(key.className).toContain('bg-yellow-500');
+    expect(key.className).toContain('bg-[var(--tile-present)]');
   });
 
   it('applies dark gray background for absent status', () => {
     const keyStatuses: Record<string, KeyStatus> = { C: 'absent' };
     render(<VirtualKeyboard onKeyPress={vi.fn()} onEnter={vi.fn()} onBackspace={vi.fn()} keyStatuses={keyStatuses} />);
     const key = screen.getByRole('button', { name: /Letter C/i });
-    expect(key.className).toContain('bg-gray-600');
+    expect(key.className).toContain('bg-[var(--tile-absent)]');
   });
 
   it('disables all keys when disabled prop is true', () => {

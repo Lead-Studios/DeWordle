@@ -19,6 +19,7 @@ import { MobileMenu } from './MobileMenu';
 import { HeaderSyncStatus } from './HeaderSyncStatus';
 import { ThemeToggle } from './ThemeToggle';
 import { PlayerProfileCard } from './PlayerProfileCard';
+import { StreakBadge } from './StreakBadge';
 import { useWalletContext } from '@/providers/stellar-wallet-provider';
 
 const navItems = [
@@ -99,6 +100,7 @@ export default function Header() {
         {isAuthenticated && (
           <div className="hidden md:flex gap-4 items-center">
             <HeaderSyncStatus enabled={isAuthenticated} />
+            <StreakBadge address={walletAddress} />
             <button
               type="button"
               aria-label="Start onboarding tutorial"

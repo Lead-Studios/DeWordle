@@ -19,9 +19,9 @@ const ROWS = [
 ];
 
 const STATUS_STYLES: Record<KeyStatus, string> = {
-  correct: 'bg-green-600 text-white border-green-700',
-  present: 'bg-yellow-500 text-white border-yellow-600',
-  absent: 'bg-gray-600 text-white border-gray-700',
+  correct: 'bg-[var(--tile-correct)] text-[var(--tile-correct-fg)] border-[var(--tile-correct-border)]',
+  present: 'bg-[var(--tile-present)] text-[var(--tile-present-fg)] border-[var(--tile-present-border)]',
+  absent: 'bg-[var(--tile-absent)] text-[var(--tile-absent-fg)] border-[var(--tile-absent-border)]',
   idle: 'bg-dark-300 text-white border-dark-400 hover:bg-dark-400',
 };
 
